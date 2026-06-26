@@ -6,7 +6,7 @@ RiskOptima Platform is split into four explicit layers:
 2. FastAPI REST API for portfolio ingestion, reports, and scenarios.
 3. Domain and repository layer that persists portfolios to SQLite behind an interface.
 4. Generated-run cache that stores report/chart JSON by deterministic portfolio/date hash.
-5. Analytics layer that uses synthetic market data and RiskOptima market-risk/factor APIs.
+5. Analytics layer that uses synthetic market data and RiskOptima market-risk, factor, optimization, and signal/backtest APIs.
 
 ```mermaid
 flowchart LR
@@ -16,8 +16,11 @@ flowchart LR
   API --> Runs["Generation service"]
   Runs --> Cache["backend/generated_data"]
   Runs --> Analytics["Risk service"]
+  API --> Signals["Signal service"]
+  Signals --> RiskOptima
   Analytics --> RiskOptima["RiskOptima package"]
   Analytics --> Synthetic["Synthetic market data"]
+  Signals --> Synthetic
 ```
 
 The repository interface is deliberately small: save, list, get, and update portfolios. A PostgreSQL implementation can be added later without changing route handlers or risk services.
@@ -33,6 +36,7 @@ The repository interface is deliberately small: save, list, get, and update port
 7. If cache is missing or force refresh is requested, risk requests generate deterministic synthetic asset and factor returns.
 8. RiskOptima calculates dashboard-ready market risk metrics and efficient frontier output.
 9. The platform enriches the report with marginal VaR, component VaR, factor exposures, stress results, chart-ready time series, and notebook-style rendered RiskOptima charts.
+10. The signal service reuses the same dated synthetic prices to run RiskOptima SMA signal frames and the backtest engine for instrument drilldowns.
 
 ## Synthetic Data
 
@@ -47,3 +51,15 @@ Generated artifacts are kept outside SQLite because rendered chart payloads are 
 - `metadata.json`
 
 The cache key includes the complete portfolio payload, the resolved start date, the resolved as-of date, and an engine version string. Editing a position naturally creates a new run id, while **Force recalc** overwrites an existing run folder for the same key.
+
+## Notebook Onboarding Map
+
+The platform now covers the portfolio optimization, SMA strategy, and core-feature notebooks. The current UI deliberately treats holdings as clickable analytical objects: after a run, users can open an instrument and inspect RiskOptima SMA crossovers, completed trades, current state, volatility, drawdown, and portfolio strategy equity.
+
+Remaining notebook surfaces should be added as separate workbench tabs rather than overloaded into the main risk report:
+
+- volatility divergence signals
+- options IV/Greeks/event strategy analytics
+- credit risk and migration analytics
+- fixed-income duration/convexity analytics
+- stochastic volatility scenario models

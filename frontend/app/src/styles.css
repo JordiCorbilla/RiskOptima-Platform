@@ -377,6 +377,121 @@ select {
   padding: 8px 9px;
 }
 
+.signal-workbench {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.signal-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.signal-list {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.signal-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 3px 8px;
+  padding: 12px;
+  border: 1px solid #d8dee8;
+  border-radius: 6px;
+  color: #172033;
+  text-align: left;
+  background: #ffffff;
+}
+
+.signal-row--active {
+  border-color: #1f6feb;
+  background: #e8f1ff;
+}
+
+.signal-row span {
+  color: #1f7a3f;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.signal-row small {
+  color: #657386;
+}
+
+.signal-row em {
+  color: #516071;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.signal-detail {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.signal-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  background: #d8dee8;
+}
+
+.signal-kpis div {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.signal-kpis span {
+  color: #687385;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.signal-bottom-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
+  gap: 16px;
+}
+
+.signal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: #516071;
+  font-size: 0.84rem;
+}
+
+.signal-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.legend-dot--buy {
+  background: #1f7a3f;
+}
+
+.legend-dot--sell {
+  background: #cf222e;
+}
+
 .panel-heading {
   display: flex;
   align-items: baseline;
@@ -484,8 +599,14 @@ th {
 
   .summary-strip,
   .chart-grid,
-  .table-grid {
+  .table-grid,
+  .signal-layout,
+  .signal-bottom-grid {
     grid-template-columns: 1fr;
+  }
+
+  .signal-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -510,6 +631,10 @@ th {
   }
 
   .editor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .signal-kpis {
     grid-template-columns: 1fr;
   }
 }

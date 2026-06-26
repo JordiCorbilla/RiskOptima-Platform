@@ -92,6 +92,19 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     assert forced_response.status_code == 200
     assert forced_response.json()["cache_hit"] is False
 
+    signals_response = client.get(
+        f"{get_settings().api_prefix}/portfolios/{portfolio_id}/signals",
+        params={"start_date": "2024-06-26", "as_of_date": "2026-06-28", "short_window": 10, "long_window": 30},
+    )
+    assert signals_response.status_code == 200
+    signals = signals_response.json()
+    assert signals["as_of_date"] == "2026-06-26"
+    assert len(signals["summary"]) == 3
+    assert "AAA" in signals["details"]
+    assert signals["details"]["AAA"]["signals"]
+    assert "portfolio_equity" in signals
+    assert signals["portfolio_equity"]
+
     scenarios_response = client.get(f"{get_settings().api_prefix}/scenarios")
     assert scenarios_response.status_code == 200
     scenario_id = scenarios_response.json()[0]["id"]

@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from datetime import date
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 
 from app.db.session import get_portfolio_repository
 from app.domain.models import (
@@ -17,6 +19,7 @@ from app.services.portfolio_service import parse_portfolio_csv
 from app.services.generation_service import generate_portfolio_run
 from app.services.render_service import build_rendered_charts
 from app.services.risk_service import build_portfolio_risk_report
+from app.services.signal_service import build_signal_report
 from app.services.stress_service import get_scenario, list_scenarios, run_stress_scenario
 
 router = APIRouter()
@@ -110,6 +113,34 @@ def get_portfolio_renders(
     if portfolio is None:
         raise HTTPException(status_code=404, detail="Portfolio not found")
     return {"charts": build_rendered_charts(portfolio)}
+
+
+@router.get("/portfolios/{portfolio_id}/signals")
+def get_portfolio_signals(
+    portfolio_id: int,
+    start_date: date | None = None,
+    as_of_date: date | None = None,
+    short_window: int = Query(20, ge=2, le=120),
+    long_window: int = Query(50, ge=3, le=260),
+    stop_loss: float | None = Query(0.05, ge=0.0, le=1.0),
+    take_profit: float | None = Query(0.10, ge=0.0, le=2.0),
+    repository: PortfolioRepository = Depends(get_portfolio_repository),
+) -> dict:
+    portfolio = repository.get(portfolio_id)
+    if portfolio is None:
+        raise HTTPException(status_code=404, detail="Portfolio not found")
+    try:
+        return build_signal_report(
+            portfolio,
+            start_date=start_date,
+            as_of_date=as_of_date,
+            short_window=short_window,
+            long_window=long_window,
+            stop_loss=stop_loss,
+            take_profit=take_profit,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @router.get("/portfolios/{portfolio_id}/stress", response_model=list[ScenarioResult])

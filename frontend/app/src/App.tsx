@@ -4,8 +4,9 @@ import { ContributorsTable, CorrelationMatrixTable, PortfolioDetailsTable, Stres
 import { MetricCard } from "./components/MetricCard";
 import { RenderedChartGallery } from "./components/RenderedChartGallery";
 import { RiskCharts } from "./components/RiskCharts";
-import { generatePortfolioRun, getPortfolio, listPortfolios, updatePortfolio, uploadPortfolio } from "./services/api";
-import type { Portfolio, PortfolioSummary, RenderedChart, RiskReport } from "./types/api";
+import { SignalWorkbench } from "./components/SignalWorkbench";
+import { generatePortfolioRun, getPortfolio, getPortfolioSignals, listPortfolios, updatePortfolio, uploadPortfolio } from "./services/api";
+import type { Portfolio, PortfolioSignalReport, PortfolioSummary, RenderedChart, RiskReport } from "./types/api";
 import { formatCurrency } from "./utils";
 
 const assetClasses = ["Equity", "Fixed Income", "Credit", "Commodity", "Cash", "Alternative"];
@@ -46,9 +47,13 @@ export function App() {
   const [portfolioDetail, setPortfolioDetail] = useState<Portfolio | null>(null);
   const [report, setReport] = useState<RiskReport | null>(null);
   const [renderedCharts, setRenderedCharts] = useState<RenderedChart[]>([]);
+  const [signalReport, setSignalReport] = useState<PortfolioSignalReport | null>(null);
+  const [selectedSignalSymbol, setSelectedSignalSymbol] = useState<string | null>(null);
   const [uploadName, setUploadName] = useState("Flagship Institutional Portfolio");
   const [asOfDate, setAsOfDate] = useState(() => previousBusinessDateString());
   const [startDate, setStartDate] = useState(() => defaultStartDateString(previousBusinessDateString()));
+  const [shortWindow, setShortWindow] = useState(20);
+  const [longWindow, setLongWindow] = useState(50);
   const [status, setStatus] = useState("Load a synthetic CSV portfolio to begin.");
   const [loading, setLoading] = useState(false);
 
@@ -80,8 +85,18 @@ export function App() {
         as_of_date: asOfDate,
         force
       });
+      const signals = await getPortfolioSignals(portfolioId, {
+        start_date: run.start_date,
+        as_of_date: run.as_of_date,
+        short_window: shortWindow,
+        long_window: longWindow,
+        stop_loss: 0.05,
+        take_profit: 0.1
+      });
       setReport(run.report);
       setRenderedCharts(run.charts);
+      setSignalReport(signals);
+      setSelectedSignalSymbol(signals.summary[0]?.symbol ?? null);
       setStatus(
         `${run.cache_hit ? "Loaded cached" : "Generated"} run ${run.run_id} for ${run.start_date} to ${run.as_of_date}.`
       );
@@ -191,6 +206,8 @@ export function App() {
                 setSelectedId(portfolio.id);
                 setReport(null);
                 setRenderedCharts([]);
+                setSignalReport(null);
+                setSelectedSignalSymbol(null);
                 loadPortfolio(portfolio.id);
               }}
             >
@@ -262,6 +279,14 @@ export function App() {
                     if (!startDate) setStartDate(defaultStartDateString(event.target.value));
                   }}
                 />
+              </label>
+              <label>
+                <span>Short SMA</span>
+                <input type="number" min={2} max={120} value={shortWindow} onChange={(event) => setShortWindow(Number(event.target.value))} />
+              </label>
+              <label>
+                <span>Long SMA</span>
+                <input type="number" min={3} max={260} value={longWindow} onChange={(event) => setLongWindow(Number(event.target.value))} />
               </label>
             </div>
             <div className="table-wrap editable-table">
@@ -384,6 +409,13 @@ export function App() {
             </section>
 
             <PortfolioDetailsTable report={report} />
+            {signalReport ? (
+              <SignalWorkbench
+                signalReport={signalReport}
+                selectedSymbol={selectedSignalSymbol}
+                onSelectSymbol={setSelectedSignalSymbol}
+              />
+            ) : null}
             <RenderedChartGallery charts={renderedCharts} loading={loading && renderedCharts.length === 0} />
             <RiskCharts report={report} />
 

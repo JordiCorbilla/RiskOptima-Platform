@@ -1,4 +1,4 @@
-import type { GeneratedRun, Portfolio, PortfolioSummary, RenderedChart, RiskReport } from "../types/api";
+import type { GeneratedRun, Portfolio, PortfolioSignalReport, PortfolioSummary, RenderedChart, RiskReport } from "../types/api";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
@@ -58,4 +58,24 @@ export function generatePortfolioRun(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   });
+}
+
+export function getPortfolioSignals(
+  portfolioId: number,
+  params: {
+    start_date?: string;
+    as_of_date?: string;
+    short_window?: number;
+    long_window?: number;
+    stop_loss?: number;
+    take_profit?: number;
+  }
+): Promise<PortfolioSignalReport> {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      query.set(key, String(value));
+    }
+  });
+  return request<PortfolioSignalReport>(`/portfolios/${portfolioId}/signals?${query.toString()}`);
 }

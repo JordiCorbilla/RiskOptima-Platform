@@ -2,7 +2,7 @@
 
 Full-stack institutional portfolio risk platform powered by synthetic data and the [RiskOptima](https://github.com/JordiCorbilla/RiskOptima) Python package.
 
-The platform demonstrates a production-style quant workflow: editable portfolio books, deterministic synthetic market generation, dated portfolio risk runs, VaR/CVaR, drawdown, volatility, beta, factor exposure, marginal VaR, component VaR, RiskOptima efficient frontier analytics, and stress testing.
+The platform demonstrates a production-style quant workflow: editable portfolio books, deterministic synthetic market generation, dated portfolio risk runs, VaR/CVaR, drawdown, volatility, beta, factor exposure, marginal VaR, component VaR, RiskOptima efficient frontier analytics, SMA signal intelligence, per-instrument drilldowns, and stress testing.
 
 ## Screenshots
 
@@ -99,6 +99,7 @@ The API runs on `http://localhost:8000`; the containerized frontend is exposed o
 - `PUT /api/portfolios/{id}`
 - `GET /api/portfolios/{id}/risk`
 - `POST /api/portfolios/{id}/generate`
+- `GET /api/portfolios/{id}/signals`
 - `GET /api/portfolios/{id}/stress`
 - `GET /api/scenarios`
 - `POST /api/scenarios/run`
@@ -124,6 +125,31 @@ npm test
 ## RiskOptima Integration
 
 The efficient frontier and RiskOptima chart gallery call the RiskOptima package directly. The platform supplies synthetic price data into `plot_efficient_frontier_monte_carlo(..., price_data=..., return_output=True, save_data=False, save_plot=False)` so the UI receives structured frontier points and the rendered library chart without requiring live market downloads.
+
+The signal workbench calls RiskOptima's SMA helpers and backtest engine:
+
+- `build_sma_signal_frame`
+- `trades_from_sma_signals`
+- `SMACrossStrategy`
+- `run_backtest`
+
+Each generated portfolio run can be paired with a dated signal report so users can click a holding and inspect close price, SMA bands, buy/sell crossovers, trade history, win rate, drawdown, and strategy equity path.
+
+## Notebook Coverage
+
+Current platform coverage:
+
+- `02-portfolio_optimization_riskoptima.ipynb`: correlation, area chart, efficient frontier, optimized weights, probability analysis.
+- `05-portfolio_sma_strategy.ipynb`: SMA signal frames, trade logs, per-stock signal drilldowns, and portfolio SMA equity curve.
+- `07-core_features_demo.ipynb`: reusable portfolio/risk/backtest primitives through the platform services.
+
+Next onboarding candidates:
+
+- `03-index_vol_divergence_signals.ipynb`: index/volatility divergence event stream and entry/exit overlays.
+- `06-Options Trading Toolkit...ipynb`: IV term structure, Greeks simulator, and straddle event backtester.
+- `08-credit_risk_model_demo.ipynb`: credit VaR, migration, expected loss, and Merton distance-to-default views.
+- `01-bond_analytics_riskoptima.ipynb`: duration/convexity drilldowns for fixed-income holdings.
+- `04-Stochastic_Volatility_Models_RiskOptima.ipynb`: Hull-White, Heston, and SABR scenario sandbox.
 
 ## Notes
 

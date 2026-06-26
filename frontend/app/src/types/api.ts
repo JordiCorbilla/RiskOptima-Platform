@@ -94,3 +94,64 @@ export interface GeneratedRun {
   report: RiskReport;
   charts: RenderedChart[];
 }
+
+export interface SignalPoint {
+  date: string;
+  close: number;
+  sma_short: number | null;
+  sma_long: number | null;
+  signal: number;
+}
+
+export interface SignalTrade {
+  ticker: string;
+  entry_date: string;
+  exit_date: string;
+  entry_price: number;
+  exit_price: number;
+  return: number;
+  exit_reason: string;
+}
+
+export interface SignalSummary {
+  symbol: string;
+  name: string;
+  asset_class: string;
+  sector: string;
+  weight: number;
+  close: number;
+  sma_short: number;
+  sma_long: number;
+  state: string;
+  latest_signal: string;
+  last_signal: string;
+  last_signal_date: string | null;
+  trade_count: number;
+  win_rate: number;
+  average_trade_return: number;
+  cumulative_trade_return: number;
+  annualized_volatility: number;
+  max_drawdown: number;
+}
+
+export interface SignalDetail extends SignalSummary {
+  signals: SignalPoint[];
+  trades: SignalTrade[];
+}
+
+export interface PortfolioSignalReport {
+  portfolio_id: number;
+  portfolio_name: string;
+  generated_at: string;
+  start_date: string;
+  as_of_date: string;
+  short_window: number;
+  long_window: number;
+  stop_loss: number | null;
+  take_profit: number | null;
+  summary: SignalSummary[];
+  details: Record<string, SignalDetail>;
+  portfolio_equity: Array<{ date: string; value: number; cash: number; costs: number; turnover: number }>;
+  portfolio_final_weights: Record<string, number>;
+  trades: SignalTrade[];
+}
