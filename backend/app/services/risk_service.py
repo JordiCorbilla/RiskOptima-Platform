@@ -86,6 +86,73 @@ def _factor_exposures(asset_returns: pd.DataFrame, factor_returns: pd.DataFrame,
         return exposure_frame.mul(weights.reindex(exposure_frame.index), axis=0).sum()
 
 
+def _optimize_portfolio(returns: pd.DataFrame, weights: pd.Series, risk_free_rate: float = 0.0) -> dict:
+    expected_returns = returns.mean() * 252
+    covariance = returns.cov() * 252
+    rng = np.random.default_rng(31_337)
+    symbols = list(weights.index)
+
+    def metrics(candidate: pd.Series) -> dict[str, float]:
+        candidate = candidate.reindex(symbols).astype(float)
+        annual_return = float(candidate.dot(expected_returns.reindex(symbols)))
+        volatility = float(np.sqrt(candidate.values.T @ covariance.reindex(index=symbols, columns=symbols).values @ candidate.values))
+        sharpe = float((annual_return - risk_free_rate) / volatility) if volatility else 0.0
+        return {"return": annual_return, "volatility": volatility, "sharpe": sharpe}
+
+    _ensure_riskoptima_path()
+    try:
+        from riskoptima import optimize_max_sharpe, optimize_min_variance
+
+        max_sharpe = optimize_max_sharpe(expected_returns.reindex(symbols), covariance.reindex(index=symbols, columns=symbols), risk_free_rate=risk_free_rate)
+        min_variance = optimize_min_variance(covariance.reindex(index=symbols, columns=symbols), expected_returns=expected_returns.reindex(symbols))
+    except Exception:
+        simulated_weights = rng.dirichlet(np.ones(len(symbols)), size=4000)
+        simulated_metrics = []
+        for row in simulated_weights:
+            candidate = pd.Series(row, index=symbols)
+            simulated_metrics.append(metrics(candidate))
+        max_sharpe = pd.Series(simulated_weights[int(np.argmax([item["sharpe"] for item in simulated_metrics]))], index=symbols)
+        min_variance = pd.Series(simulated_weights[int(np.argmin([item["volatility"] for item in simulated_metrics]))], index=symbols)
+
+    frontier = []
+    for row in rng.dirichlet(np.ones(len(symbols)), size=1500):
+        candidate = pd.Series(row, index=symbols)
+        item = metrics(candidate)
+        frontier.append({"volatility": item["volatility"], "return": item["return"], "sharpe": item["sharpe"]})
+
+    current_metrics = metrics(weights)
+    max_sharpe_metrics = metrics(max_sharpe)
+    min_variance_metrics = metrics(min_variance)
+
+    return {
+        "summary": {
+            "current": current_metrics,
+            "max_sharpe": max_sharpe_metrics,
+            "min_variance": min_variance_metrics,
+        },
+        "efficient_frontier": frontier,
+        "allocation_comparison": [
+            {
+                "symbol": symbol,
+                "current": float(weights[symbol]),
+                "max_sharpe": float(max_sharpe.reindex(symbols)[symbol]),
+                "min_variance": float(min_variance.reindex(symbols)[symbol]),
+            }
+            for symbol in symbols
+        ],
+        "correlation_matrix": [
+            {"x": left, "y": right, "value": float(value)}
+            for left, row in returns.reindex(columns=symbols).corr().iterrows()
+            for right, value in row.items()
+        ],
+        "highlight_points": [
+            {"name": "Current", **current_metrics},
+            {"name": "Max Sharpe", **max_sharpe_metrics},
+            {"name": "Min Variance", **min_variance_metrics},
+        ],
+    }
+
+
 def _var_contributors(returns: pd.DataFrame, weights: pd.Series, portfolio_value: float, confidence: float = 0.95) -> list[dict[str, float | str]]:
     covariance = returns.cov().reindex(index=weights.index, columns=weights.index).fillna(0.0)
     weights_vector = weights.values
@@ -190,4 +257,5 @@ def build_portfolio_risk_report(portfolio: Portfolio) -> RiskReport:
         largest_contributors=contributors,
         stress_results=stress_results,
         positions=positions,
+        optimization=_optimize_portfolio(returns, weights),
     )

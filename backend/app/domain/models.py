@@ -114,3 +114,4 @@ class RiskReport(BaseModel):
     largest_contributors: list[dict[str, Any]]
     stress_results: list[ScenarioResult]
     positions: list[dict[str, Any]]
+    optimization: dict[str, Any] = Field(default_factory=dict)

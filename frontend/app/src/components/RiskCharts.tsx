@@ -7,6 +7,8 @@ import {
   LineChart,
   ReferenceLine,
   ResponsiveContainer,
+  Scatter,
+  ScatterChart,
   Tooltip,
   XAxis,
   YAxis
@@ -72,6 +74,44 @@ export function RiskCharts({ report }: { report: RiskReport }) {
                 <Cell key={index} fill={factorColors[index % factorColors.length]} />
               ))}
             </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="panel chart-panel chart-panel--wide">
+        <div className="panel-heading">
+          <h2>Efficient Frontier</h2>
+          <span>RiskOptima max-Sharpe / min-variance</span>
+        </div>
+        <ResponsiveContainer width="100%" height={320}>
+          <ScatterChart>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="volatility" name="Volatility" tickFormatter={formatPercent} />
+            <YAxis dataKey="return" name="Return" tickFormatter={formatPercent} />
+            <Tooltip
+              cursor={{ strokeDasharray: "3 3" }}
+              formatter={(value: number, name: string) => (name === "sharpe" ? value.toFixed(2) : formatPercent(value))}
+            />
+            <Scatter name="Monte Carlo portfolios" data={report.optimization.efficient_frontier} fill="#69a1ff" opacity={0.38} />
+            <Scatter name="Portfolio points" data={report.optimization.highlight_points} fill="#cf222e" />
+          </ScatterChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="panel chart-panel chart-panel--wide">
+        <div className="panel-heading">
+          <h2>Allocation Comparison</h2>
+          <span>Current vs optimized weights</span>
+        </div>
+        <ResponsiveContainer width="100%" height={320}>
+          <BarChart data={report.optimization.allocation_comparison}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis dataKey="symbol" />
+            <YAxis tickFormatter={formatPercent} />
+            <Tooltip formatter={(value: number) => formatPercent(value)} />
+            <Bar dataKey="current" fill="#687385" name="Current" />
+            <Bar dataKey="max_sharpe" fill="#1f6feb" name="Max Sharpe" />
+            <Bar dataKey="min_variance" fill="#2da44e" name="Min Variance" />
           </BarChart>
         </ResponsiveContainer>
       </div>

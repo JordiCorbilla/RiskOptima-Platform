@@ -46,4 +46,11 @@ export interface RiskReport {
   largest_contributors: Array<Record<string, number | string>>;
   stress_results: ScenarioResult[];
   positions: Array<Record<string, number | string>>;
+  optimization: {
+    summary: Record<string, { return: number; volatility: number; sharpe: number }>;
+    efficient_frontier: Array<{ volatility: number; return: number; sharpe: number }>;
+    allocation_comparison: Array<{ symbol: string; current: number; max_sharpe: number; min_variance: number }>;
+    correlation_matrix: Array<{ x: string; y: string; value: number }>;
+    highlight_points: Array<{ name: string; return: number; volatility: number; sharpe: number }>;
+  };
 }

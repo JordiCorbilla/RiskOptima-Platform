@@ -1,5 +1,6 @@
 import type { RiskReport } from "../types/api";
 import { formatCurrency, formatPercent } from "../utils";
+import React from "react";
 
 export function StressScenarioTable({ report }: { report: RiskReport }) {
   return (
@@ -64,6 +65,42 @@ export function ContributorsTable({ report }: { report: RiskReport }) {
             ))}
           </tbody>
         </table>
+      </div>
+    </section>
+  );
+}
+
+export function CorrelationMatrixTable({ report }: { report: RiskReport }) {
+  const symbols = Array.from(new Set(report.optimization.correlation_matrix.map((item) => item.x)));
+  const valueFor = (x: string, y: string) =>
+    report.optimization.correlation_matrix.find((item) => item.x === x && item.y === y)?.value ?? 0;
+
+  return (
+    <section className="panel">
+      <div className="panel-heading">
+        <h2>Correlation Matrix</h2>
+        <span>Notebook heatmap rendered as data</span>
+      </div>
+      <div className="correlation-grid" style={{ gridTemplateColumns: `90px repeat(${symbols.length}, minmax(48px, 1fr))` }}>
+        <span />
+        {symbols.map((symbol) => (
+          <strong key={symbol}>{symbol}</strong>
+        ))}
+        {symbols.map((row) => (
+          <React.Fragment key={row}>
+            <strong>{row}</strong>
+            {symbols.map((column) => {
+              const value = valueFor(row, column);
+              const alpha = Math.min(1, Math.abs(value));
+              const background = value >= 0 ? `rgba(31, 111, 235, ${alpha})` : `rgba(207, 34, 46, ${alpha})`;
+              return (
+                <span key={`${row}-${column}`} style={{ background }}>
+                  {value.toFixed(2)}
+                </span>
+              );
+            })}
+          </React.Fragment>
+        ))}
       </div>
     </section>
   );

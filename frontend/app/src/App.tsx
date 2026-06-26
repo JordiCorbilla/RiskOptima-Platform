@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { RefreshCw, UploadCloud } from "lucide-react";
-import { ContributorsTable, StressScenarioTable } from "./components/Tables";
+import { ContributorsTable, CorrelationMatrixTable, StressScenarioTable } from "./components/Tables";
 import { MetricCard } from "./components/MetricCard";
 import { RiskCharts } from "./components/RiskCharts";
 import { getRiskReport, listPortfolios, uploadPortfolio } from "./services/api";
@@ -140,6 +140,7 @@ export function App() {
               <StressScenarioTable report={report} />
               <ContributorsTable report={report} />
             </section>
+            <CorrelationMatrixTable report={report} />
           </>
         ) : (
           <section className="empty-state">

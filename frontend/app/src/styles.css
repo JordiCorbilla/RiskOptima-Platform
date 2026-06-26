@@ -315,6 +315,33 @@ th {
   color: #172033;
 }
 
+.correlation-grid {
+  display: grid;
+  gap: 2px;
+  overflow-x: auto;
+  align-items: stretch;
+}
+
+.correlation-grid strong,
+.correlation-grid span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 6px;
+  border-radius: 4px;
+  font-size: 0.76rem;
+}
+
+.correlation-grid strong {
+  color: #516071;
+  background: #edf2f7;
+}
+
+.correlation-grid span {
+  color: #ffffff;
+}
+
 @media (max-width: 1120px) {
   .metric-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

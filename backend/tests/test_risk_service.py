@@ -37,3 +37,6 @@ def test_risk_report_contains_requested_sections():
     assert report.factor_exposure
     assert report.largest_contributors
     assert report.stress_results
+    assert report.optimization["efficient_frontier"]
+    assert report.optimization["allocation_comparison"]
+    assert report.optimization["correlation_matrix"]
