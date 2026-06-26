@@ -1,0 +1,11 @@
+symbol,name,asset_class,sector,quantity,price,currency,beta
+SPY,US Equity Core,Equity,US Large Cap,12500,512.34,USD,1.00
+EFA,Developed Markets Equity,Equity,International Equity,9000,82.15,USD,1.08
+IWM,US Small Cap Equity,Equity,US Small Cap,4200,218.42,USD,1.22
+LQD,Investment Grade Credit,Credit,Corporate Credit,18000,108.30,USD,0.42
+HYG,High Yield Credit,Credit,High Yield,7500,79.20,USD,0.71
+TLT,Long Treasury,Fixed Income,Rates,6400,92.65,USD,-0.18
+IEF,Intermediate Treasury,Fixed Income,Rates,10000,94.55,USD,-0.08
+GLD,Gold Trust,Commodity,Precious Metals,3800,214.10,USD,0.05
+VNQ,Real Estate,Alternative,REITs,5100,84.35,USD,0.82
+BIL,Treasury Bills,Cash,Cash,16000,91.72,USD,0.00

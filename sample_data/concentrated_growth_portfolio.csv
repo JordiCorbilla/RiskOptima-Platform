@@ -1,0 +1,8 @@
+symbol,name,asset_class,sector,quantity,price,currency,beta
+NVDA,NVIDIA Corporation,Equity,Semiconductors,2200,126.80,USD,1.65
+MSFT,Microsoft Corporation,Equity,Software,1800,448.70,USD,1.12
+AMZN,Amazon.com Inc,Equity,Consumer Discretionary,1600,186.40,USD,1.28
+META,Meta Platforms,Equity,Communication Services,900,504.20,USD,1.24
+QQQ,Nasdaq 100 ETF,Equity,Technology,3500,481.10,USD,1.20
+LQD,Investment Grade Credit,Credit,Corporate Credit,5000,108.30,USD,0.42
+BIL,Treasury Bills,Cash,Cash,6500,91.72,USD,0.00
