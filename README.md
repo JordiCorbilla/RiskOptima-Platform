@@ -6,9 +6,13 @@ The platform demonstrates a production-style quant workflow: portfolio upload, d
 
 ## Screenshots
 
-> Screenshot placeholder: dashboard overview with portfolio summary, risk cards, and VaR/CVaR chart.
+Desktop dashboard:
 
-> Screenshot placeholder: stress scenario table and largest VaR contributors table.
+![RiskOptima Platform desktop dashboard](docs/screenshots/dashboard-desktop.png)
+
+Mobile dashboard:
+
+![RiskOptima Platform mobile dashboard](docs/screenshots/dashboard-mobile.png)
 
 ## Architecture
 

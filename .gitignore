@@ -5,6 +5,7 @@ __pycache__/
 *.py[cod]
 *.db
 *.log
+tools/
 
 # Node
 node_modules/
