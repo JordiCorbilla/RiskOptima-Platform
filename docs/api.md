@@ -12,6 +12,7 @@ Base URL: `http://127.0.0.1:8000/api`
 | GET | `/portfolios/{id}/renders` | Render RiskOptima notebook-style chart images. |
 | POST | `/portfolios/{id}/generate` | Generate or load a cached dated risk run. |
 | GET | `/portfolios/{id}/signals` | Build RiskOptima SMA signal and per-instrument drilldown report. |
+| GET | `/portfolios/{id}/notebooks` | Build consolidated workbench output for all remaining RiskOptima notebooks. |
 | GET | `/portfolios/{id}/stress` | Run every built-in scenario. |
 | GET | `/scenarios` | List built-in stress scenarios. |
 | POST | `/scenarios/run` | Run one scenario for one portfolio. |
@@ -42,6 +43,19 @@ The response includes:
 - buy/sell crossover state
 - completed trade logs with stop-loss and take-profit exits
 - win rate, cumulative trade return, volatility, and drawdown
+
+## Notebook Workbench
+
+`GET /portfolios/{id}/notebooks?start_date=2024-06-26&as_of_date=2026-06-26`
+
+The response covers the remaining RiskOptima notebooks:
+
+- ML plus mean-variance optimization
+- index/volatility divergence entries, exits, and returns
+- options IV term structure, Greeks, and event straddles
+- credit expected loss, credit VaR/CVaR, migration, and Merton PD
+- fixed-income duration, modified duration, PVBP, and convexity
+- Hull-White, Heston, and SABR stochastic-volatility paths
 
 ## CSV Format
 

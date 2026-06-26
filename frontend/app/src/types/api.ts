@@ -155,3 +155,67 @@ export interface PortfolioSignalReport {
   portfolio_final_weights: Record<string, number>;
   trades: SignalTrade[];
 }
+
+export interface NotebookWorkbench {
+  portfolio_id: number;
+  generated_at: string;
+  start_date: string;
+  as_of_date: string;
+  optimization_ml: {
+    weights: Array<{
+      symbol: string;
+      current: number;
+      min_variance: number;
+      max_sharpe: number;
+      ml_adjusted: number;
+      momentum_score: number;
+    }>;
+    metrics: Record<string, { return: number; volatility: number; sharpe: number }>;
+  };
+  index_vol_divergence: {
+    series: Array<{ date: string; base: number; vix: number; ma: number | null; upper: number | null; lower: number | null }>;
+    signals: Array<{ date: string; base: number; vix: number; comment: string }>;
+    exits: Array<{ entry_date: string; exit_date: string; entry_price: number; exit_price: number; reason: string }>;
+    returns: Array<{ entry_date: string; exit_date: string; pnl: number; total_return: number }>;
+  };
+  options: {
+    symbol: string;
+    spot: number;
+    historical_vol: number;
+    iv_term_structure: Array<{ expiry_days: number; iv: number; historical_vol: number }>;
+    greeks: Array<{ strike: number; delta: number; gamma: number; theta: number; vega: number }>;
+    straddles: Array<{ event_date: string; entry_price: number; exit_price: number; abs_move: number; straddle_cost: number; profit: number }>;
+  };
+  credit: {
+    obligors: Array<{ symbol: string; pd: number; lgd: number; ead: number; rating: string; expected_loss: number }>;
+    portfolio_expected_loss: number;
+    credit_var_99: number;
+    credit_cvar_99: number;
+    loss_distribution: Array<{ bucket: number; loss: number }>;
+    migration: Record<string, Record<string, string>>;
+    merton: Array<{ symbol: string; pd: number }>;
+  };
+  bonds: {
+    bonds: Array<{
+      symbol: string;
+      coupon: number;
+      yield: number;
+      maturity_years: number;
+      macaulay_duration: number;
+      modified_duration: number;
+      pvbp: number;
+      convexity: number;
+    }>;
+  };
+  stochastic_volatility: {
+    paths: Array<{
+      date: string;
+      hull_white: number;
+      heston: number;
+      sabr: number;
+      hull_white_vol: number;
+      heston_vol: number;
+      sabr_vol: number;
+    }>;
+  };
+}

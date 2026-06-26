@@ -54,12 +54,14 @@ The cache key includes the complete portfolio payload, the resolved start date, 
 
 ## Notebook Onboarding Map
 
-The platform now covers the portfolio optimization, SMA strategy, and core-feature notebooks. The current UI deliberately treats holdings as clickable analytical objects: after a run, users can open an instrument and inspect RiskOptima SMA crossovers, completed trades, current state, volatility, drawdown, and portfolio strategy equity.
+The platform now covers all current RiskOptima notebook angles. The current UI deliberately treats holdings as clickable analytical objects: after a run, users can open an instrument and inspect RiskOptima SMA crossovers, completed trades, current state, volatility, drawdown, and portfolio strategy equity.
 
-Remaining notebook surfaces should be added as separate workbench tabs rather than overloaded into the main risk report:
+Additional notebook surfaces are exposed as a separate workbench rather than overloaded into the main risk report:
 
 - volatility divergence signals
 - options IV/Greeks/event strategy analytics
 - credit risk and migration analytics
 - fixed-income duration/convexity analytics
 - stochastic volatility scenario models
+
+The notebooks that rely on live Yahoo data are represented through deterministic synthetic data and structured payloads. That keeps the flagship demo reproducible while preserving the analytical intent of the library examples.

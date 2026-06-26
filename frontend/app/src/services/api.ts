@@ -1,4 +1,4 @@
-import type { GeneratedRun, Portfolio, PortfolioSignalReport, PortfolioSummary, RenderedChart, RiskReport } from "../types/api";
+import type { GeneratedRun, NotebookWorkbench, Portfolio, PortfolioSignalReport, PortfolioSummary, RenderedChart, RiskReport } from "../types/api";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
@@ -78,4 +78,15 @@ export function getPortfolioSignals(
     }
   });
   return request<PortfolioSignalReport>(`/portfolios/${portfolioId}/signals?${query.toString()}`);
+}
+
+export function getNotebookWorkbench(
+  portfolioId: number,
+  params: { start_date?: string; as_of_date?: string }
+): Promise<NotebookWorkbench> {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value) query.set(key, value);
+  });
+  return request<NotebookWorkbench>(`/portfolios/${portfolioId}/notebooks?${query.toString()}`);
 }

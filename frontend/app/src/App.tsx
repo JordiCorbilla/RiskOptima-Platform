@@ -2,11 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, Plus, RefreshCw, Save, Trash2, UploadCloud } from "lucide-react";
 import { ContributorsTable, CorrelationMatrixTable, PortfolioDetailsTable, StressScenarioTable } from "./components/Tables";
 import { MetricCard } from "./components/MetricCard";
+import { NotebookWorkbench } from "./components/NotebookWorkbench";
 import { RenderedChartGallery } from "./components/RenderedChartGallery";
 import { RiskCharts } from "./components/RiskCharts";
 import { SignalWorkbench } from "./components/SignalWorkbench";
-import { generatePortfolioRun, getPortfolio, getPortfolioSignals, listPortfolios, updatePortfolio, uploadPortfolio } from "./services/api";
-import type { Portfolio, PortfolioSignalReport, PortfolioSummary, RenderedChart, RiskReport } from "./types/api";
+import { generatePortfolioRun, getNotebookWorkbench, getPortfolio, getPortfolioSignals, listPortfolios, updatePortfolio, uploadPortfolio } from "./services/api";
+import type { NotebookWorkbench as NotebookWorkbenchPayload, Portfolio, PortfolioSignalReport, PortfolioSummary, RenderedChart, RiskReport } from "./types/api";
 import { formatCurrency } from "./utils";
 
 const assetClasses = ["Equity", "Fixed Income", "Credit", "Commodity", "Cash", "Alternative"];
@@ -48,6 +49,7 @@ export function App() {
   const [report, setReport] = useState<RiskReport | null>(null);
   const [renderedCharts, setRenderedCharts] = useState<RenderedChart[]>([]);
   const [signalReport, setSignalReport] = useState<PortfolioSignalReport | null>(null);
+  const [notebookWorkbench, setNotebookWorkbench] = useState<NotebookWorkbenchPayload | null>(null);
   const [selectedSignalSymbol, setSelectedSignalSymbol] = useState<string | null>(null);
   const [uploadName, setUploadName] = useState("Flagship Institutional Portfolio");
   const [asOfDate, setAsOfDate] = useState(() => previousBusinessDateString());
@@ -93,9 +95,14 @@ export function App() {
         stop_loss: 0.05,
         take_profit: 0.1
       });
+      const notebooks = await getNotebookWorkbench(portfolioId, {
+        start_date: run.start_date,
+        as_of_date: run.as_of_date
+      });
       setReport(run.report);
       setRenderedCharts(run.charts);
       setSignalReport(signals);
+      setNotebookWorkbench(notebooks);
       setSelectedSignalSymbol(signals.summary[0]?.symbol ?? null);
       setStatus(
         `${run.cache_hit ? "Loaded cached" : "Generated"} run ${run.run_id} for ${run.start_date} to ${run.as_of_date}.`
@@ -207,6 +214,7 @@ export function App() {
                 setReport(null);
                 setRenderedCharts([]);
                 setSignalReport(null);
+                setNotebookWorkbench(null);
                 setSelectedSignalSymbol(null);
                 loadPortfolio(portfolio.id);
               }}
@@ -416,6 +424,7 @@ export function App() {
                 onSelectSymbol={setSelectedSignalSymbol}
               />
             ) : null}
+            {notebookWorkbench ? <NotebookWorkbench workbench={notebookWorkbench} /> : null}
             <RenderedChartGallery charts={renderedCharts} loading={loading && renderedCharts.length === 0} />
             <RiskCharts report={report} />
 

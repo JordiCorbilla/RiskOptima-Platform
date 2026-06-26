@@ -8,6 +8,7 @@ vi.mock("./services/api", () => ({
   updatePortfolio: vi.fn(),
   generatePortfolioRun: vi.fn(),
   getPortfolioSignals: vi.fn(),
+  getNotebookWorkbench: vi.fn(),
   uploadPortfolio: vi.fn()
 }));
 

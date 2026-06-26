@@ -105,6 +105,20 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     assert "portfolio_equity" in signals
     assert signals["portfolio_equity"]
 
+    notebooks_response = client.get(
+        f"{get_settings().api_prefix}/portfolios/{portfolio_id}/notebooks",
+        params={"start_date": "2024-06-26", "as_of_date": "2026-06-28"},
+    )
+    assert notebooks_response.status_code == 200
+    notebooks = notebooks_response.json()
+    assert notebooks["as_of_date"] == "2026-06-26"
+    assert notebooks["optimization_ml"]["weights"]
+    assert "index_vol_divergence" in notebooks
+    assert notebooks["options"]["greeks"]
+    assert notebooks["credit"]["obligors"]
+    assert notebooks["bonds"]["bonds"]
+    assert notebooks["stochastic_volatility"]["paths"]
+
     scenarios_response = client.get(f"{get_settings().api_prefix}/scenarios")
     assert scenarios_response.status_code == 200
     scenario_id = scenarios_response.json()[0]["id"]

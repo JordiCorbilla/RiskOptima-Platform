@@ -2,7 +2,7 @@
 
 Full-stack institutional portfolio risk platform powered by synthetic data and the [RiskOptima](https://github.com/JordiCorbilla/RiskOptima) Python package.
 
-The platform demonstrates a production-style quant workflow: editable portfolio books, deterministic synthetic market generation, dated portfolio risk runs, VaR/CVaR, drawdown, volatility, beta, factor exposure, marginal VaR, component VaR, RiskOptima efficient frontier analytics, SMA signal intelligence, per-instrument drilldowns, and stress testing.
+The platform demonstrates a production-style quant workflow: editable portfolio books, deterministic synthetic market generation, dated portfolio risk runs, VaR/CVaR, drawdown, volatility, beta, factor exposure, marginal VaR, component VaR, RiskOptima efficient frontier analytics, SMA signal intelligence, notebook workbenches, per-instrument drilldowns, and stress testing.
 
 ## Screenshots
 
@@ -100,6 +100,7 @@ The API runs on `http://localhost:8000`; the containerized frontend is exposed o
 - `GET /api/portfolios/{id}/risk`
 - `POST /api/portfolios/{id}/generate`
 - `GET /api/portfolios/{id}/signals`
+- `GET /api/portfolios/{id}/notebooks`
 - `GET /api/portfolios/{id}/stress`
 - `GET /api/scenarios`
 - `POST /api/scenarios/run`
@@ -142,14 +143,13 @@ Current platform coverage:
 - `02-portfolio_optimization_riskoptima.ipynb`: correlation, area chart, efficient frontier, optimized weights, probability analysis.
 - `05-portfolio_sma_strategy.ipynb`: SMA signal frames, trade logs, per-stock signal drilldowns, and portfolio SMA equity curve.
 - `07-core_features_demo.ipynb`: reusable portfolio/risk/backtest primitives through the platform services.
+- `03-index_vol_divergence_signals.ipynb`: synthetic index/VIX divergence event stream, exits, and return overlays using RiskOptima exit/return functions.
+- `06-Options Trading Toolkit...ipynb`: synthetic IV term structure, Greeks simulator, and event straddle backtester.
+- `08-credit_risk_model_demo.ipynb`: expected loss, credit VaR/CVaR, migration, and Merton PD views.
+- `01-bond_analytics_riskoptima.ipynb`: cash-flow duration, modified duration, PVBP, and convexity drilldowns.
+- `04-Stochastic_Volatility_Models_RiskOptima.ipynb`: Hull-White, Heston, and SABR scenario paths.
 
-Next onboarding candidates:
-
-- `03-index_vol_divergence_signals.ipynb`: index/volatility divergence event stream and entry/exit overlays.
-- `06-Options Trading Toolkit...ipynb`: IV term structure, Greeks simulator, and straddle event backtester.
-- `08-credit_risk_model_demo.ipynb`: credit VaR, migration, expected loss, and Merton distance-to-default views.
-- `01-bond_analytics_riskoptima.ipynb`: duration/convexity drilldowns for fixed-income holdings.
-- `04-Stochastic_Volatility_Models_RiskOptima.ipynb`: Hull-White, Heston, and SABR scenario sandbox.
+Yahoo-dependent notebook functions are represented with synthetic structured inputs so the public demo remains deterministic and credential-free.
 
 ## Notes
 

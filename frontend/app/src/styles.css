@@ -383,6 +383,37 @@ select {
   margin-bottom: 18px;
 }
 
+.notebook-workbench {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.notebook-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  margin-bottom: 14px;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  background: #d8dee8;
+}
+
+.notebook-kpi-grid div {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.notebook-kpi-grid span {
+  color: #687385;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
 .signal-layout {
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr);
@@ -635,6 +666,10 @@ th {
   }
 
   .signal-kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .notebook-kpi-grid {
     grid-template-columns: 1fr;
   }
 }
