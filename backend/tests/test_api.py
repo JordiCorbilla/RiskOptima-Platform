@@ -42,6 +42,12 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     assert risk["factor_exposure"]
     assert risk["largest_contributors"]
 
+    render_response = client.get(f"{get_settings().api_prefix}/portfolios/{portfolio_id}/renders")
+    assert render_response.status_code == 200
+    renders = render_response.json()["charts"]
+    assert len(renders) == 4
+    assert renders[0]["image"].startswith("data:image/png;base64,")
+
     scenarios_response = client.get(f"{get_settings().api_prefix}/scenarios")
     assert scenarios_response.status_code == 200
     scenario_id = scenarios_response.json()[0]["id"]

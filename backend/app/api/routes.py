@@ -4,6 +4,7 @@ from app.db.session import get_portfolio_repository
 from app.domain.models import Portfolio, PortfolioSummary, RiskReport, ScenarioResult, ScenarioRunRequest, StressScenario
 from app.repositories.portfolio_repository import PortfolioRepository
 from app.services.portfolio_service import parse_portfolio_csv
+from app.services.render_service import build_rendered_charts
 from app.services.risk_service import build_portfolio_risk_report
 from app.services.stress_service import get_scenario, list_scenarios, run_stress_scenario
 
@@ -39,6 +40,17 @@ def get_portfolio_risk(
     if portfolio is None:
         raise HTTPException(status_code=404, detail="Portfolio not found")
     return build_portfolio_risk_report(portfolio)
+
+
+@router.get("/portfolios/{portfolio_id}/renders")
+def get_portfolio_renders(
+    portfolio_id: int,
+    repository: PortfolioRepository = Depends(get_portfolio_repository),
+) -> dict[str, list[dict[str, str]]]:
+    portfolio = repository.get(portfolio_id)
+    if portfolio is None:
+        raise HTTPException(status_code=404, detail="Portfolio not found")
+    return {"charts": build_rendered_charts(portfolio)}
 
 
 @router.get("/portfolios/{portfolio_id}/stress", response_model=list[ScenarioResult])

@@ -1,19 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { RefreshCw, UploadCloud } from "lucide-react";
-import { ContributorsTable, CorrelationMatrixTable, StressScenarioTable } from "./components/Tables";
+import { ContributorsTable, CorrelationMatrixTable, PortfolioDetailsTable, StressScenarioTable } from "./components/Tables";
 import { MetricCard } from "./components/MetricCard";
+import { RenderedChartGallery } from "./components/RenderedChartGallery";
 import { RiskCharts } from "./components/RiskCharts";
-import { getRiskReport, listPortfolios, uploadPortfolio } from "./services/api";
-import type { PortfolioSummary, RiskReport } from "./types/api";
+import { getRenderedCharts, getRiskReport, listPortfolios, uploadPortfolio } from "./services/api";
+import type { PortfolioSummary, RenderedChart, RiskReport } from "./types/api";
 import { formatCurrency } from "./utils";
 
 export function App() {
   const [portfolios, setPortfolios] = useState<PortfolioSummary[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [report, setReport] = useState<RiskReport | null>(null);
+  const [renderedCharts, setRenderedCharts] = useState<RenderedChart[]>([]);
   const [uploadName, setUploadName] = useState("Flagship Institutional Portfolio");
   const [status, setStatus] = useState("Load a synthetic CSV portfolio to begin.");
   const [loading, setLoading] = useState(false);
+  const [renderLoading, setRenderLoading] = useState(false);
 
   async function refreshPortfolios(nextId?: number) {
     const data = await listPortfolios();
@@ -31,6 +34,11 @@ export function App() {
       const nextReport = await getRiskReport(portfolioId);
       setReport(nextReport);
       setStatus(`Risk report generated at ${new Date(nextReport.generated_at).toLocaleString()}.`);
+      setRenderLoading(true);
+      getRenderedCharts(portfolioId)
+        .then((payload) => setRenderedCharts(payload.charts))
+        .catch(() => setRenderedCharts([]))
+        .finally(() => setRenderLoading(false));
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Unable to load risk report.");
     } finally {
@@ -134,6 +142,8 @@ export function App() {
               ))}
             </section>
 
+            <PortfolioDetailsTable report={report} />
+            <RenderedChartGallery charts={renderedCharts} loading={renderLoading} />
             <RiskCharts report={report} />
 
             <section className="table-grid">

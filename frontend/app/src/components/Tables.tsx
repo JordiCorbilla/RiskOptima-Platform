@@ -35,6 +35,43 @@ export function StressScenarioTable({ report }: { report: RiskReport }) {
   );
 }
 
+export function PortfolioDetailsTable({ report }: { report: RiskReport }) {
+  return (
+    <section className="panel">
+      <div className="panel-heading">
+        <h2>Portfolio Details</h2>
+        <span>Uploaded positions</span>
+      </div>
+      <div className="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Name</th>
+              <th>Asset Class</th>
+              <th>Sector</th>
+              <th>Market Value</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            {report.positions.map((position) => (
+              <tr key={String(position.symbol)}>
+                <td>{position.symbol}</td>
+                <td>{position.name}</td>
+                <td>{position.asset_class}</td>
+                <td>{position.sector}</td>
+                <td>{formatCurrency(Number(position.market_value))}</td>
+                <td>{formatPercent(Number(position.weight))}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
 export function ContributorsTable({ report }: { report: RiskReport }) {
   return (
     <section className="panel">

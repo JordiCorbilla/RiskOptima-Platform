@@ -54,3 +54,9 @@ export interface RiskReport {
     highlight_points: Array<{ name: string; return: number; volatility: number; sharpe: number }>;
   };
 }
+
+export interface RenderedChart {
+  title: string;
+  description: string;
+  image: string;
+}

@@ -1,4 +1,4 @@
-import type { PortfolioSummary, RiskReport } from "../types/api";
+import type { PortfolioSummary, RenderedChart, RiskReport } from "../types/api";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
@@ -17,6 +17,10 @@ export function listPortfolios(): Promise<PortfolioSummary[]> {
 
 export function getRiskReport(portfolioId: number): Promise<RiskReport> {
   return request<RiskReport>(`/portfolios/${portfolioId}/risk`);
+}
+
+export function getRenderedCharts(portfolioId: number): Promise<{ charts: RenderedChart[] }> {
+  return request<{ charts: RenderedChart[] }>(`/portfolios/${portfolioId}/renders`);
 }
 
 export function uploadPortfolio(file: File, name: string): Promise<{ id: number }> {
