@@ -16,6 +16,7 @@ import squarify
 from app.domain.models import Portfolio
 from app.services.market_data_service import generate_synthetic_market_data
 from app.services.risk_service import _optimize_portfolio
+from app.services.risk_service import _ensure_riskoptima_path
 
 
 def _png_data_url(fig: plt.Figure) -> str:
@@ -84,32 +85,38 @@ def _correlation_heatmap(returns: pd.DataFrame) -> dict[str, str]:
     return {"title": "Correlation Matrix", "description": "RiskOptima heatmap treatment rendered from synthetic returns.", "image": _png_data_url(fig)}
 
 
-def _efficient_frontier_chart(returns: pd.DataFrame, weights: pd.Series, optimization: dict) -> dict[str, str]:
-    frontier = pd.DataFrame(optimization["efficient_frontier"])
-    highlights = pd.DataFrame(optimization["highlight_points"])
+def _riskoptima_efficient_frontier_chart(returns: pd.DataFrame, weights: pd.Series) -> dict[str, str]:
+    symbols = list(weights.index)
+    price_data = (1.0 + returns.reindex(columns=symbols)).cumprod() * 100.0
+    benchmark_returns = returns.reindex(columns=symbols).mean(axis=1)
+    benchmark_return = float((1.0 + benchmark_returns).prod() ** (252 / len(benchmark_returns)) - 1.0)
+    benchmark_volatility = float(benchmark_returns.std(ddof=0) * np.sqrt(252))
+    benchmark_sharpe = float(benchmark_return / benchmark_volatility) if benchmark_volatility else 0.0
+    asset_table = pd.DataFrame({"Asset": symbols, "Weight": weights.reindex(symbols).values, "Label": symbols})
 
-    fig, ax = plt.subplots(figsize=(16, 9))
-    scatter = ax.scatter(
-        frontier["volatility"],
-        frontier["return"],
-        c=frontier["sharpe"],
-        cmap="plasma",
-        alpha=0.45,
-        s=16,
-        label="Simulated Portfolios",
+    _ensure_riskoptima_path()
+    from riskoptima import RiskOptima
+
+    output = RiskOptima.plot_efficient_frontier_monte_carlo(
+        asset_table=asset_table,
+        start_date=str(returns.index.min().date()),
+        end_date=str(returns.index.max().date()),
+        risk_free_rate=0.0,
+        num_portfolios=1500,
+        market_benchmark="Synthetic Benchmark",
+        show_tables=True,
+        show_plot=False,
+        price_data=price_data,
+        benchmark_statistics=(benchmark_return, benchmark_volatility, benchmark_sharpe),
+        save_data=False,
+        save_plot=False,
+        return_output=True,
     )
-    fig.colorbar(scatter, ax=ax, label="Sharpe Ratio")
-    ax.scatter(highlights["volatility"], highlights["return"], color=["black", "green", "red"], marker="*", s=220)
-    for _, row in highlights.iterrows():
-        ax.annotate(row["name"], (row["volatility"], row["return"]), xytext=(8, 8), textcoords="offset points", fontsize=10)
-    ax.set_title("[RiskOptima] Efficient Frontier - Monte Carlo Simulation", fontsize=16, pad=16)
-    ax.set_xlabel("Volatility")
-    ax.set_ylabel("Return")
-    ax.xaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(1.0))
-    ax.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(1.0))
-    ax.grid(visible=True, which="major", linestyle="--", linewidth=0.5, color="gray", alpha=0.7)
-    ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.14), ncol=3)
-    return {"title": "Efficient Frontier", "description": "Matplotlib rendering of the notebook-style efficient frontier.", "image": _png_data_url(fig)}
+    return {
+        "title": "Efficient Frontier",
+        "description": "Direct RiskOptima.plot_efficient_frontier_monte_carlo render with supplied synthetic prices.",
+        "image": _png_data_url(output["figure"]),
+    }
 
 
 def _allocation_comparison_chart(optimization: dict) -> dict[str, str]:
@@ -134,6 +141,6 @@ def build_rendered_charts(portfolio: Portfolio) -> list[dict[str, str]]:
     return [
         _portfolio_area_chart(portfolio, returns, weights),
         _correlation_heatmap(returns.reindex(columns=weights.index)),
-        _efficient_frontier_chart(returns, weights, optimization),
+        _riskoptima_efficient_frontier_chart(returns, weights),
         _allocation_comparison_chart(optimization),
     ]

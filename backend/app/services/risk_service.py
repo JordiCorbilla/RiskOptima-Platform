@@ -99,12 +99,54 @@ def _optimize_portfolio(returns: pd.DataFrame, weights: pd.Series, risk_free_rat
         sharpe = float((annual_return - risk_free_rate) / volatility) if volatility else 0.0
         return {"return": annual_return, "volatility": volatility, "sharpe": sharpe}
 
-    _ensure_riskoptima_path()
-    try:
-        from riskoptima import optimize_max_sharpe, optimize_min_variance
+    price_data = (1.0 + returns.reindex(columns=symbols)).cumprod() * 100.0
+    benchmark_returns = returns.reindex(columns=symbols).mean(axis=1)
+    benchmark_return = float((1.0 + benchmark_returns).prod() ** (252 / len(benchmark_returns)) - 1.0)
+    benchmark_volatility = float(benchmark_returns.std(ddof=0) * np.sqrt(252))
+    benchmark_sharpe = float((benchmark_return - risk_free_rate) / benchmark_volatility) if benchmark_volatility else 0.0
+    asset_table = pd.DataFrame(
+        {
+            "Asset": symbols,
+            "Weight": weights.reindex(symbols).values,
+            "Label": symbols,
+        }
+    )
 
-        max_sharpe = optimize_max_sharpe(expected_returns.reindex(symbols), covariance.reindex(index=symbols, columns=symbols), risk_free_rate=risk_free_rate)
-        min_variance = optimize_min_variance(covariance.reindex(index=symbols, columns=symbols), expected_returns=expected_returns.reindex(symbols))
+    try:
+        _ensure_riskoptima_path()
+        from riskoptima import RiskOptima
+
+        riskoptima_output = RiskOptima.plot_efficient_frontier_monte_carlo(
+            asset_table=asset_table,
+            start_date=str(returns.index.min().date()),
+            end_date=str(returns.index.max().date()),
+            risk_free_rate=risk_free_rate,
+            num_portfolios=1500,
+            market_benchmark="Synthetic Benchmark",
+            show_tables=False,
+            show_plot=False,
+            price_data=price_data,
+            benchmark_statistics=(benchmark_return, benchmark_volatility, benchmark_sharpe),
+            save_data=False,
+            save_plot=False,
+            return_output=True,
+        )
+        try:
+            import matplotlib.pyplot as plt
+
+            plt.close(riskoptima_output["figure"])
+        except Exception:
+            pass
+        max_sharpe = riskoptima_output["cml_weights"].reindex(symbols).astype(float)
+        min_variance = riskoptima_output["gmv_weights"].reindex(symbols).astype(float)
+        frontier = [
+            {
+                "volatility": float(row["Volatility"]),
+                "return": float(row["Return"]),
+                "sharpe": float(row["Sharpe Ratio"]),
+            }
+            for _, row in riskoptima_output["simulated_portfolios"].iterrows()
+        ]
     except Exception:
         simulated_weights = rng.dirichlet(np.ones(len(symbols)), size=4000)
         simulated_metrics = []
@@ -113,12 +155,11 @@ def _optimize_portfolio(returns: pd.DataFrame, weights: pd.Series, risk_free_rat
             simulated_metrics.append(metrics(candidate))
         max_sharpe = pd.Series(simulated_weights[int(np.argmax([item["sharpe"] for item in simulated_metrics]))], index=symbols)
         min_variance = pd.Series(simulated_weights[int(np.argmin([item["volatility"] for item in simulated_metrics]))], index=symbols)
-
-    frontier = []
-    for row in rng.dirichlet(np.ones(len(symbols)), size=1500):
-        candidate = pd.Series(row, index=symbols)
-        item = metrics(candidate)
-        frontier.append({"volatility": item["volatility"], "return": item["return"], "sharpe": item["sharpe"]})
+        frontier = []
+        for row in rng.dirichlet(np.ones(len(symbols)), size=1500):
+            candidate = pd.Series(row, index=symbols)
+            item = metrics(candidate)
+            frontier.append({"volatility": item["volatility"], "return": item["return"], "sharpe": item["sharpe"]})
 
     current_metrics = metrics(weights)
     max_sharpe_metrics = metrics(max_sharpe)
