@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+from datetime import date
 from io import BytesIO
 
 import matplotlib
@@ -134,8 +135,31 @@ def _allocation_comparison_chart(optimization: dict) -> dict[str, str]:
     return {"title": "Optimized Weights", "description": "Current, max-Sharpe, and minimum-variance allocations.", "image": _png_data_url(fig)}
 
 
-def build_rendered_charts(portfolio: Portfolio) -> list[dict[str, str]]:
-    returns, _ = generate_synthetic_market_data(portfolio)
+def _probability_distribution_chart(returns: pd.DataFrame, weights: pd.Series) -> dict[str, str]:
+    portfolio_returns = returns.reindex(columns=weights.index).dot(weights)
+    rng = np.random.default_rng(80_085)
+    horizon_days = 252
+    samples = rng.choice(portfolio_returns.dropna().values, size=(3000, horizon_days), replace=True)
+    final_returns = np.prod(1.0 + samples, axis=1) - 1.0
+    fig, ax = plt.subplots(figsize=(14, 8))
+    ax.hist(final_returns, bins=55, color="#69a1ff", alpha=0.78, edgecolor="#1f2937", linewidth=0.4)
+    ax.axvline(np.percentile(final_returns, 5), color="#cf222e", linestyle="--", label="5th percentile")
+    ax.axvline(np.percentile(final_returns, 50), color="#1f7a3f", linestyle="-", label="Median")
+    ax.set_title("[RiskOptima] Probability Distribution of Final Portfolio Returns", fontsize=16, pad=16)
+    ax.set_xlabel("One-year simulated return")
+    ax.set_ylabel("Frequency")
+    ax.xaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(1.0))
+    ax.grid(axis="y", linestyle="--", linewidth=0.5, alpha=0.6)
+    ax.legend()
+    return {"title": "Probability Analysis", "description": "Notebook-style Monte Carlo distribution of final portfolio returns.", "image": _png_data_url(fig)}
+
+
+def build_rendered_charts(
+    portfolio: Portfolio,
+    start_date: date | None = None,
+    as_of_date: date | None = None,
+) -> list[dict[str, str]]:
+    returns, _ = generate_synthetic_market_data(portfolio, start_date=start_date, as_of_date=as_of_date)
     weights = _portfolio_weights(portfolio)
     optimization = _optimize_portfolio(returns, weights)
     return [
@@ -143,4 +167,5 @@ def build_rendered_charts(portfolio: Portfolio) -> list[dict[str, str]]:
         _correlation_heatmap(returns.reindex(columns=weights.index)),
         _riskoptima_efficient_frontier_chart(returns, weights),
         _allocation_comparison_chart(optimization),
+        _probability_distribution_chart(returns, weights),
     ]

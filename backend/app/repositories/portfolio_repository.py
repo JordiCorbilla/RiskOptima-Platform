@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 import json
@@ -18,6 +20,10 @@ class PortfolioRepository(ABC):
 
     @abstractmethod
     def get(self, portfolio_id: int) -> Portfolio | None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def update(self, portfolio_id: int, name: str, positions: list[Position], base_currency: str = "USD") -> Portfolio | None:
         raise NotImplementedError
 
 
@@ -107,4 +113,26 @@ class SQLitePortfolioRepository(PortfolioRepository):
             base_currency=row["base_currency"],
             created_at=datetime.fromisoformat(row["created_at"]),
             positions=[Position.model_validate(item) for item in json.loads(row["positions_json"])],
+        )
+
+    def update(self, portfolio_id: int, name: str, positions: list[Position], base_currency: str = "USD") -> Portfolio | None:
+        existing = self.get(portfolio_id)
+        if existing is None:
+            return None
+        payload = json.dumps([position.model_dump(mode="json") for position in positions])
+        with self._connect() as connection:
+            connection.execute(
+                """
+                UPDATE portfolios
+                SET name = ?, base_currency = ?, positions_json = ?
+                WHERE id = ?
+                """,
+                (name, base_currency, payload, portfolio_id),
+            )
+        return Portfolio(
+            id=portfolio_id,
+            name=name,
+            base_currency=base_currency,
+            created_at=existing.created_at,
+            positions=positions,
         )

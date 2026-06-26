@@ -11,6 +11,8 @@ from app.repositories.portfolio_repository import SQLitePortfolioRepository
 def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     app = create_app()
     repository = SQLitePortfolioRepository(tmp_path / "test.db")
+    settings = get_settings()
+    settings.generated_data_path = tmp_path / "generated_data"
     app.dependency_overrides[get_portfolio_repository] = lambda: repository
     client = TestClient(app)
 
@@ -33,10 +35,28 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     assert list_response.status_code == 200
     assert list_response.json()[0]["position_count"] == 3
 
+    detail_response = client.get(f"{get_settings().api_prefix}/portfolios/{portfolio_id}")
+    assert detail_response.status_code == 200
+    detail = detail_response.json()
+    detail["name"] = "Edited Portfolio"
+    detail["positions"][0]["quantity"] = 125
+
+    update_response = client.put(
+        f"{get_settings().api_prefix}/portfolios/{portfolio_id}",
+        json={
+            "name": detail["name"],
+            "base_currency": detail["base_currency"],
+            "positions": detail["positions"],
+        },
+    )
+    assert update_response.status_code == 200
+    assert update_response.json()["name"] == "Edited Portfolio"
+    assert update_response.json()["positions"][0]["quantity"] == 125
+
     risk_response = client.get(f"{get_settings().api_prefix}/portfolios/{portfolio_id}/risk")
     assert risk_response.status_code == 200
     risk = risk_response.json()
-    assert risk["portfolio_name"] == "Test Portfolio"
+    assert risk["portfolio_name"] == "Edited Portfolio"
     assert len(risk["metrics"]) >= 8
     assert risk["drawdown"]
     assert risk["factor_exposure"]
@@ -45,8 +65,32 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     render_response = client.get(f"{get_settings().api_prefix}/portfolios/{portfolio_id}/renders")
     assert render_response.status_code == 200
     renders = render_response.json()["charts"]
-    assert len(renders) == 4
+    assert len(renders) == 5
     assert renders[0]["image"].startswith("data:image/png;base64,")
+
+    generate_response = client.post(
+        f"{get_settings().api_prefix}/portfolios/{portfolio_id}/generate",
+        json={"start_date": "2024-06-26", "as_of_date": "2026-06-28"},
+    )
+    assert generate_response.status_code == 200
+    generated = generate_response.json()
+    assert generated["as_of_date"] == "2026-06-26"
+    assert generated["cache_hit"] is False
+    assert len(generated["charts"]) == 5
+
+    cached_response = client.post(
+        f"{get_settings().api_prefix}/portfolios/{portfolio_id}/generate",
+        json={"start_date": "2024-06-26", "as_of_date": "2026-06-28"},
+    )
+    assert cached_response.status_code == 200
+    assert cached_response.json()["cache_hit"] is True
+
+    forced_response = client.post(
+        f"{get_settings().api_prefix}/portfolios/{portfolio_id}/generate",
+        json={"start_date": "2024-06-26", "as_of_date": "2026-06-28", "force": True},
+    )
+    assert forced_response.status_code == 200
+    assert forced_response.json()["cache_hit"] is False
 
     scenarios_response = client.get(f"{get_settings().api_prefix}/scenarios")
     assert scenarios_response.status_code == 200

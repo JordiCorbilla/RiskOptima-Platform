@@ -17,7 +17,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -67,13 +68,18 @@ input {
   font-weight: 700;
 }
 
-input {
+input,
+select {
   width: 100%;
   border: 1px solid #344154;
   border-radius: 6px;
   padding: 10px 12px;
   color: #f8fafc;
   background: #1b2433;
+}
+
+select {
+  appearance: none;
 }
 
 .upload-zone {
@@ -99,7 +105,9 @@ input {
 }
 
 .portfolio-button,
-.icon-button {
+.icon-button,
+.ghost-button,
+.table-icon-button {
   border: 1px solid transparent;
   border-radius: 6px;
   cursor: pointer;
@@ -152,9 +160,40 @@ input {
   background: #1f6feb;
 }
 
-.icon-button:disabled {
+.ghost-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  color: #172033;
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.table-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  color: #cf222e;
+  background: #fff1f1;
+}
+
+.icon-button:disabled,
+.ghost-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .status-line {
@@ -295,6 +334,49 @@ input {
   padding: 16px;
 }
 
+.portfolio-editor {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.portfolio-editor .panel-heading {
+  margin-bottom: 0;
+}
+
+.editor-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.editor-grid label {
+  display: grid;
+  gap: 6px;
+  color: #516071;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.editor-grid input,
+.editable-table input,
+.editable-table select {
+  min-width: 92px;
+  color: #172033;
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.editable-table td {
+  padding: 7px 6px;
+}
+
+.editable-table input,
+.editable-table select {
+  padding: 8px 9px;
+}
+
 .panel-heading {
   display: flex;
   align-items: baseline;
@@ -385,6 +467,10 @@ th {
   .metric-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .editor-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 860px) {
@@ -414,7 +500,16 @@ th {
     flex-direction: column;
   }
 
+  .topbar-actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
   .metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-grid {
     grid-template-columns: 1fr;
   }
 }

@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 import sys
 
@@ -222,8 +222,12 @@ def _metric(name: str, value: float, unit: str = "ratio", description: str = "",
     return RiskMetric(name=name, value=float(value), unit=unit, description=description, confidence=confidence)
 
 
-def build_portfolio_risk_report(portfolio: Portfolio) -> RiskReport:
-    returns, factor_returns = generate_synthetic_market_data(portfolio)
+def build_portfolio_risk_report(
+    portfolio: Portfolio,
+    start_date: date | None = None,
+    as_of_date: date | None = None,
+) -> RiskReport:
+    returns, factor_returns = generate_synthetic_market_data(portfolio, start_date=start_date, as_of_date=as_of_date)
     market_values = pd.Series({position.instrument.symbol: position.market_value for position in portfolio.positions})
     weights = market_values / market_values.sum()
     benchmark = factor_returns["Market"].rename("benchmark")

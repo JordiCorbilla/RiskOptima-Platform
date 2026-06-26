@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 import numpy as np
 import pandas as pd
 
@@ -7,14 +9,46 @@ from app.domain.models import Portfolio
 FACTOR_NAMES = ["Market", "Size", "Value", "Momentum", "Rates"]
 
 
-def generate_synthetic_market_data(portfolio: Portfolio, periods: int = 504, seed: int | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
+def previous_business_day(value: date | None = None) -> date:
+    current = value or date.today()
+    current = current - timedelta(days=1)
+    while current.weekday() >= 5:
+        current = current - timedelta(days=1)
+    return current
+
+
+def as_business_day(value: date) -> date:
+    current = value
+    while current.weekday() >= 5:
+        current = current - timedelta(days=1)
+    return current
+
+
+def default_start_date(as_of_date: date | None = None, years: int = 2) -> date:
+    end = as_of_date or previous_business_day()
+    return date(end.year - years, end.month, end.day)
+
+
+def generate_synthetic_market_data(
+    portfolio: Portfolio,
+    periods: int = 504,
+    seed: int | None = None,
+    start_date: date | None = None,
+    as_of_date: date | None = None,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     symbols = [position.instrument.symbol for position in portfolio.positions]
     if not symbols:
         raise ValueError("Portfolio has no positions")
 
     derived_seed = seed if seed is not None else portfolio.id * 10_003 + len(symbols)
     rng = np.random.default_rng(derived_seed)
-    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=periods)
+    if as_of_date is not None or start_date is not None:
+        resolved_as_of = as_business_day(as_of_date) if as_of_date else previous_business_day()
+        resolved_start = start_date or default_start_date(resolved_as_of)
+        dates = pd.bdate_range(start=pd.Timestamp(resolved_start), end=pd.Timestamp(resolved_as_of))
+        periods = len(dates)
+    else:
+        dates = pd.bdate_range(end=pd.Timestamp(previous_business_day()), periods=periods)
 
     factor_cov = np.array(
         [

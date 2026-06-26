@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     app_name: str = "RiskOptima Platform API"
     api_prefix: str = "/api"
     database_path: Path = Path("backend/riskoptima_platform.db")
+    generated_data_path: Path = Path("backend/generated_data")
     riskoptima_path: Path = Path("../portfolio_risk_kit")
     cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
 

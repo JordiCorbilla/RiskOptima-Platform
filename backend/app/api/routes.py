@@ -1,9 +1,20 @@
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
 from app.db.session import get_portfolio_repository
-from app.domain.models import Portfolio, PortfolioSummary, RiskReport, ScenarioResult, ScenarioRunRequest, StressScenario
+from app.domain.models import (
+    GenerateRunRequest,
+    GeneratedRun,
+    Portfolio,
+    PortfolioSummary,
+    PortfolioUpdateRequest,
+    RiskReport,
+    ScenarioResult,
+    ScenarioRunRequest,
+    StressScenario,
+)
 from app.repositories.portfolio_repository import PortfolioRepository
 from app.services.portfolio_service import parse_portfolio_csv
+from app.services.generation_service import generate_portfolio_run
 from app.services.render_service import build_rendered_charts
 from app.services.risk_service import build_portfolio_risk_report
 from app.services.stress_service import get_scenario, list_scenarios, run_stress_scenario
@@ -31,6 +42,34 @@ def get_portfolios(repository: PortfolioRepository = Depends(get_portfolio_repos
     return repository.list()
 
 
+@router.get("/portfolios/{portfolio_id}", response_model=Portfolio)
+def get_portfolio(
+    portfolio_id: int,
+    repository: PortfolioRepository = Depends(get_portfolio_repository),
+) -> Portfolio:
+    portfolio = repository.get(portfolio_id)
+    if portfolio is None:
+        raise HTTPException(status_code=404, detail="Portfolio not found")
+    return portfolio
+
+
+@router.put("/portfolios/{portfolio_id}", response_model=Portfolio)
+def update_portfolio(
+    portfolio_id: int,
+    request: PortfolioUpdateRequest,
+    repository: PortfolioRepository = Depends(get_portfolio_repository),
+) -> Portfolio:
+    portfolio = repository.update(
+        portfolio_id=portfolio_id,
+        name=request.name,
+        base_currency=request.base_currency,
+        positions=request.positions,
+    )
+    if portfolio is None:
+        raise HTTPException(status_code=404, detail="Portfolio not found")
+    return portfolio
+
+
 @router.get("/portfolios/{portfolio_id}/risk", response_model=RiskReport)
 def get_portfolio_risk(
     portfolio_id: int,
@@ -40,6 +79,26 @@ def get_portfolio_risk(
     if portfolio is None:
         raise HTTPException(status_code=404, detail="Portfolio not found")
     return build_portfolio_risk_report(portfolio)
+
+
+@router.post("/portfolios/{portfolio_id}/generate", response_model=GeneratedRun)
+def generate_portfolio(
+    portfolio_id: int,
+    request: GenerateRunRequest,
+    repository: PortfolioRepository = Depends(get_portfolio_repository),
+) -> GeneratedRun:
+    portfolio = repository.get(portfolio_id)
+    if portfolio is None:
+        raise HTTPException(status_code=404, detail="Portfolio not found")
+    try:
+        return generate_portfolio_run(
+            portfolio,
+            start_date=request.start_date,
+            as_of_date=request.as_of_date,
+            force=request.force,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @router.get("/portfolios/{portfolio_id}/renders")

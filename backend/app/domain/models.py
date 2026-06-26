@@ -45,6 +45,12 @@ class Portfolio(BaseModel):
         return sum(position.market_value for position in self.positions)
 
 
+class PortfolioUpdateRequest(BaseModel):
+    name: str
+    base_currency: str = "USD"
+    positions: list[Position]
+
+
 class PortfolioSummary(BaseModel):
     id: int
     name: str
@@ -115,3 +121,20 @@ class RiskReport(BaseModel):
     stress_results: list[ScenarioResult]
     positions: list[dict[str, Any]]
     optimization: dict[str, Any] = Field(default_factory=dict)
+
+
+class GenerateRunRequest(BaseModel):
+    start_date: date | None = None
+    as_of_date: date | None = None
+    force: bool = False
+
+
+class GeneratedRun(BaseModel):
+    portfolio_id: int
+    run_id: str
+    start_date: date
+    as_of_date: date
+    generated_at: datetime
+    cache_hit: bool
+    report: RiskReport
+    charts: list[dict[str, str]]

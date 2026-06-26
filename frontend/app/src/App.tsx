@@ -1,22 +1,56 @@
 import { useEffect, useMemo, useState } from "react";
-import { RefreshCw, UploadCloud } from "lucide-react";
+import { CalendarDays, Plus, RefreshCw, Save, Trash2, UploadCloud } from "lucide-react";
 import { ContributorsTable, CorrelationMatrixTable, PortfolioDetailsTable, StressScenarioTable } from "./components/Tables";
 import { MetricCard } from "./components/MetricCard";
 import { RenderedChartGallery } from "./components/RenderedChartGallery";
 import { RiskCharts } from "./components/RiskCharts";
-import { getRenderedCharts, getRiskReport, listPortfolios, uploadPortfolio } from "./services/api";
-import type { PortfolioSummary, RenderedChart, RiskReport } from "./types/api";
+import { generatePortfolioRun, getPortfolio, listPortfolios, updatePortfolio, uploadPortfolio } from "./services/api";
+import type { Portfolio, PortfolioSummary, RenderedChart, RiskReport } from "./types/api";
 import { formatCurrency } from "./utils";
+
+const assetClasses = ["Equity", "Fixed Income", "Credit", "Commodity", "Cash", "Alternative"];
+
+function previousBusinessDateString(base = new Date()) {
+  const value = new Date(base);
+  value.setDate(value.getDate() - 1);
+  while (value.getDay() === 0 || value.getDay() === 6) {
+    value.setDate(value.getDate() - 1);
+  }
+  return value.toISOString().slice(0, 10);
+}
+
+function defaultStartDateString(asOfDate: string) {
+  const value = new Date(`${asOfDate}T00:00:00`);
+  value.setFullYear(value.getFullYear() - 2);
+  return value.toISOString().slice(0, 10);
+}
+
+function blankPortfolioRow(): Portfolio["positions"][number] {
+  return {
+    instrument: {
+      symbol: "NEW",
+      name: "New Instrument",
+      asset_class: "Equity",
+      sector: "Diversified",
+      currency: "USD",
+      beta: 1
+    },
+    quantity: 100,
+    price: 100
+  };
+}
 
 export function App() {
   const [portfolios, setPortfolios] = useState<PortfolioSummary[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [portfolioDetail, setPortfolioDetail] = useState<Portfolio | null>(null);
   const [report, setReport] = useState<RiskReport | null>(null);
   const [renderedCharts, setRenderedCharts] = useState<RenderedChart[]>([]);
   const [uploadName, setUploadName] = useState("Flagship Institutional Portfolio");
+  const [asOfDate, setAsOfDate] = useState(() => previousBusinessDateString());
+  const [startDate, setStartDate] = useState(() => defaultStartDateString(previousBusinessDateString()));
   const [status, setStatus] = useState("Load a synthetic CSV portfolio to begin.");
   const [loading, setLoading] = useState(false);
-  const [renderLoading, setRenderLoading] = useState(false);
 
   async function refreshPortfolios(nextId?: number) {
     const data = await listPortfolios();
@@ -24,23 +58,35 @@ export function App() {
     const targetId = nextId ?? selectedId ?? data[0]?.id ?? null;
     setSelectedId(targetId);
     if (targetId) {
-      await refreshRisk(targetId);
+      await loadPortfolio(targetId);
     }
   }
 
-  async function refreshRisk(portfolioId: number) {
+  async function loadPortfolio(portfolioId: number) {
+    try {
+      const detail = await getPortfolio(portfolioId);
+      setPortfolioDetail(detail);
+    } catch (error) {
+      setPortfolioDetail(null);
+      setStatus(error instanceof Error ? error.message : "Unable to load portfolio details.");
+    }
+  }
+
+  async function generateRun(portfolioId: number, force = false) {
     setLoading(true);
     try {
-      const nextReport = await getRiskReport(portfolioId);
-      setReport(nextReport);
-      setStatus(`Risk report generated at ${new Date(nextReport.generated_at).toLocaleString()}.`);
-      setRenderLoading(true);
-      getRenderedCharts(portfolioId)
-        .then((payload) => setRenderedCharts(payload.charts))
-        .catch(() => setRenderedCharts([]))
-        .finally(() => setRenderLoading(false));
+      const run = await generatePortfolioRun(portfolioId, {
+        start_date: startDate,
+        as_of_date: asOfDate,
+        force
+      });
+      setReport(run.report);
+      setRenderedCharts(run.charts);
+      setStatus(
+        `${run.cache_hit ? "Loaded cached" : "Generated"} run ${run.run_id} for ${run.start_date} to ${run.as_of_date}.`
+      );
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Unable to load risk report.");
+      setStatus(error instanceof Error ? error.message : "Unable to generate portfolio run.");
     } finally {
       setLoading(false);
     }
@@ -61,12 +107,60 @@ export function App() {
     try {
       const portfolio = await uploadPortfolio(file, uploadName);
       await refreshPortfolios(portfolio.id);
-      setStatus(`Uploaded ${file.name} and generated a new risk report.`);
+      setStatus(`Uploaded ${file.name}. Save any edits, then generate the dated run.`);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Upload failed.");
     } finally {
       setLoading(false);
     }
+  }
+
+  async function onSavePortfolio() {
+    if (!portfolioDetail) return;
+    setLoading(true);
+    try {
+      const saved = await updatePortfolio(portfolioDetail);
+      setPortfolioDetail(saved);
+      await refreshPortfolios(saved.id);
+      setStatus("Portfolio details saved. Generate will create a new cache key if positions changed.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Unable to save portfolio.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function updatePosition(index: number, patch: Partial<Portfolio["positions"][number]>) {
+    setPortfolioDetail((current) => {
+      if (!current) return current;
+      return {
+        ...current,
+        positions: current.positions.map((position, positionIndex) =>
+          positionIndex === index ? { ...position, ...patch } : position
+        )
+      };
+    });
+  }
+
+  function updateInstrument(index: number, patch: Partial<Portfolio["positions"][number]["instrument"]>) {
+    setPortfolioDetail((current) => {
+      if (!current) return current;
+      return {
+        ...current,
+        positions: current.positions.map((position, positionIndex) =>
+          positionIndex === index
+            ? { ...position, instrument: { ...position.instrument, ...patch } }
+            : position
+        )
+      };
+    });
+  }
+
+  function removePosition(index: number) {
+    setPortfolioDetail((current) => {
+      if (!current) return current;
+      return { ...current, positions: current.positions.filter((_, positionIndex) => positionIndex !== index) };
+    });
   }
 
   return (
@@ -95,7 +189,9 @@ export function App() {
               className={portfolio.id === selectedId ? "portfolio-button portfolio-button--active" : "portfolio-button"}
               onClick={() => {
                 setSelectedId(portfolio.id);
-                refreshRisk(portfolio.id);
+                setReport(null);
+                setRenderedCharts([]);
+                loadPortfolio(portfolio.id);
               }}
             >
               <span>{portfolio.name}</span>
@@ -111,13 +207,158 @@ export function App() {
             <p>Portfolio Risk Dashboard</p>
             <h1>{selectedPortfolio?.name ?? "Synthetic Portfolio Monitor"}</h1>
           </div>
-          <button className="icon-button" onClick={() => selectedId && refreshRisk(selectedId)} disabled={!selectedId || loading}>
-            <RefreshCw size={18} />
-            Refresh
-          </button>
+          <div className="topbar-actions">
+            <button className="icon-button" onClick={() => selectedId && generateRun(selectedId)} disabled={!selectedId || loading}>
+              <CalendarDays size={18} />
+              Generate
+            </button>
+            <button className="ghost-button" onClick={() => selectedId && generateRun(selectedId, true)} disabled={!selectedId || loading}>
+              <RefreshCw size={18} />
+              Force recalc
+            </button>
+          </div>
         </header>
 
         <div className="status-line">{status}</div>
+
+        {portfolioDetail ? (
+          <section className="panel portfolio-editor">
+            <div className="panel-heading">
+              <div>
+                <span>Portfolio Book</span>
+                <h2>Editable positions and run dates</h2>
+              </div>
+              <button className="icon-button" onClick={onSavePortfolio} disabled={loading || portfolioDetail.positions.length === 0}>
+                <Save size={18} />
+                Save details
+              </button>
+            </div>
+            <div className="editor-grid">
+              <label>
+                <span>Name</span>
+                <input
+                  value={portfolioDetail.name}
+                  onChange={(event) => setPortfolioDetail({ ...portfolioDetail, name: event.target.value })}
+                />
+              </label>
+              <label>
+                <span>Base currency</span>
+                <input
+                  value={portfolioDetail.base_currency}
+                  onChange={(event) => setPortfolioDetail({ ...portfolioDetail, base_currency: event.target.value.toUpperCase() })}
+                />
+              </label>
+              <label>
+                <span>Start date</span>
+                <input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
+              </label>
+              <label>
+                <span>As of date</span>
+                <input
+                  type="date"
+                  value={asOfDate}
+                  onChange={(event) => {
+                    setAsOfDate(event.target.value);
+                    if (!startDate) setStartDate(defaultStartDateString(event.target.value));
+                  }}
+                />
+              </label>
+            </div>
+            <div className="table-wrap editable-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Symbol</th>
+                    <th>Name</th>
+                    <th>Asset</th>
+                    <th>Sector</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Beta</th>
+                    <th>Currency</th>
+                    <th aria-label="Actions" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {portfolioDetail.positions.map((position, index) => (
+                    <tr key={`${position.instrument.symbol}-${index}`}>
+                      <td>
+                        <input
+                          value={position.instrument.symbol}
+                          onChange={(event) => updateInstrument(index, { symbol: event.target.value.toUpperCase() })}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          value={position.instrument.name}
+                          onChange={(event) => updateInstrument(index, { name: event.target.value })}
+                        />
+                      </td>
+                      <td>
+                        <select
+                          value={position.instrument.asset_class}
+                          onChange={(event) => updateInstrument(index, { asset_class: event.target.value })}
+                        >
+                          {assetClasses.map((assetClass) => (
+                            <option key={assetClass} value={assetClass}>
+                              {assetClass}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          value={position.instrument.sector}
+                          onChange={(event) => updateInstrument(index, { sector: event.target.value })}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          value={position.quantity}
+                          onChange={(event) => updatePosition(index, { quantity: Number(event.target.value) })}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          value={position.price}
+                          onChange={(event) => updatePosition(index, { price: Number(event.target.value) })}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={position.instrument.beta}
+                          onChange={(event) => updateInstrument(index, { beta: Number(event.target.value) })}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          value={position.instrument.currency}
+                          onChange={(event) => updateInstrument(index, { currency: event.target.value.toUpperCase() })}
+                        />
+                      </td>
+                      <td>
+                        <button className="table-icon-button" onClick={() => removePosition(index)} aria-label="Remove position">
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <button
+              className="ghost-button"
+              onClick={() => setPortfolioDetail({ ...portfolioDetail, positions: [...portfolioDetail.positions, blankPortfolioRow()] })}
+            >
+              <Plus size={18} />
+              Add position
+            </button>
+          </section>
+        ) : null}
 
         {report ? (
           <>
@@ -143,7 +384,7 @@ export function App() {
             </section>
 
             <PortfolioDetailsTable report={report} />
-            <RenderedChartGallery charts={renderedCharts} loading={renderLoading} />
+            <RenderedChartGallery charts={renderedCharts} loading={loading && renderedCharts.length === 0} />
             <RiskCharts report={report} />
 
             <section className="table-grid">

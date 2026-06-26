@@ -7,6 +7,29 @@ export interface PortfolioSummary {
   market_value: number;
 }
 
+export interface Instrument {
+  symbol: string;
+  name: string;
+  asset_class: string;
+  sector: string;
+  currency: string;
+  beta: number;
+}
+
+export interface Position {
+  instrument: Instrument;
+  quantity: number;
+  price: number;
+}
+
+export interface Portfolio {
+  id: number;
+  name: string;
+  base_currency: string;
+  created_at: string;
+  positions: Position[];
+}
+
 export interface RiskMetric {
   name: string;
   value: number;
@@ -59,4 +82,15 @@ export interface RenderedChart {
   title: string;
   description: string;
   image: string;
+}
+
+export interface GeneratedRun {
+  portfolio_id: number;
+  run_id: string;
+  start_date: string;
+  as_of_date: string;
+  generated_at: string;
+  cache_hit: boolean;
+  report: RiskReport;
+  charts: RenderedChart[];
 }
