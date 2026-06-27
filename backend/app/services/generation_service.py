@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 
 from app.core.config import get_settings
-from app.domain.models import GeneratedRun, Portfolio
+from app.domain.models import GeneratedRun, Portfolio, RunSummary
 from app.services.market_data_service import as_business_day, default_start_date, previous_business_day
 from app.services.render_service import build_rendered_charts
 from app.services.risk_service import build_portfolio_risk_report, riskoptima_engine_metadata
@@ -38,6 +38,29 @@ def _run_folder(portfolio_id: int, run_id: str) -> Path:
     folder = get_settings().generated_data_path / f"portfolio_{portfolio_id}" / run_id
     folder.mkdir(parents=True, exist_ok=True)
     return folder
+
+
+def list_portfolio_runs(portfolio_id: int) -> list[RunSummary]:
+    root = get_settings().generated_data_path / f"portfolio_{portfolio_id}"
+    if not root.exists():
+        return []
+    runs: list[RunSummary] = []
+    for metadata_path in root.glob("*/metadata.json"):
+        try:
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            runs.append(
+                RunSummary(
+                    portfolio_id=int(metadata["portfolio_id"]),
+                    run_id=str(metadata["run_id"]),
+                    start_date=date.fromisoformat(metadata["start_date"]),
+                    as_of_date=date.fromisoformat(metadata["as_of_date"]),
+                    generated_at=datetime.fromisoformat(metadata["generated_at"]),
+                    analytics_engine=metadata.get("analytics_engine", {}),
+                )
+            )
+        except (KeyError, ValueError, json.JSONDecodeError):
+            continue
+    return sorted(runs, key=lambda run: run.generated_at, reverse=True)
 
 
 def generate_portfolio_run(

@@ -202,6 +202,64 @@ select {
   font-size: 0.92rem;
 }
 
+.run-progress,
+.alert-panel,
+.validation-list {
+  margin-bottom: 18px;
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.run-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #0b3d73;
+  background: #e8f1ff;
+  border: 1px solid #b8d4ff;
+}
+
+.run-progress span,
+.run-progress strong {
+  font-size: 0.88rem;
+}
+
+.alert-panel {
+  color: #8a1f11;
+  background: #fff1f1;
+  border: 1px solid #ffd0d0;
+  line-height: 1.45;
+}
+
+.section-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 10px 0;
+  background: #f4f6f8;
+}
+
+.section-tab {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #334155;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.section-tab--active {
+  color: #ffffff;
+  border-color: #1f6feb;
+  background: #1f6feb;
+}
+
 .summary-strip {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -366,6 +424,51 @@ select {
   color: #172033;
   background: #ffffff;
   border-color: #cbd5e1;
+}
+
+.editor-summary {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  background: #d8dee8;
+}
+
+.editor-summary div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.editor-summary span,
+.validation-list span {
+  color: #687385;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.editor-summary strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.validation-list {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 0;
+  color: #8a1f11;
+  background: #fff8e6;
+  border: 1px solid #f1d58f;
+}
+
+.validation-list span {
+  color: #8a5a00;
+  text-transform: none;
 }
 
 .editable-table td {
@@ -536,6 +639,124 @@ select {
   font-size: 1rem;
 }
 
+.panel-heading h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  color: #1f6feb;
+  background: transparent;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.run-history {
+  margin-bottom: 18px;
+}
+
+.run-history-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.run-history-list button {
+  display: grid;
+  gap: 4px;
+  min-height: 86px;
+  padding: 12px;
+  border: 1px solid #d8dee8;
+  border-radius: 6px;
+  color: #172033;
+  text-align: left;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.run-history-list button:hover {
+  border-color: #1f6feb;
+}
+
+.run-history-list span,
+.run-history-list small {
+  color: #657386;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 20;
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  width: min(560px, 100vw);
+  height: 100vh;
+  overflow-y: auto;
+  padding: 22px;
+  background: #ffffff;
+  border-left: 1px solid #cbd5e1;
+  box-shadow: -18px 0 40px rgba(15, 23, 42, 0.16);
+}
+
+.drawer__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.drawer__header span {
+  color: #687385;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.drawer__header h2 {
+  margin: 4px 0;
+  font-size: 1.75rem;
+}
+
+.drawer__header p {
+  margin: 0;
+  color: #516071;
+}
+
+.drawer-kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  background: #d8dee8;
+}
+
+.drawer-kpis div {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.drawer-kpis span {
+  color: #687385;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.drawer-section {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+}
+
 .table-wrap {
   overflow-x: auto;
 }
@@ -614,7 +835,9 @@ th {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .editor-grid {
+  .editor-grid,
+  .editor-summary,
+  .run-history-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -632,7 +855,9 @@ th {
   .chart-grid,
   .table-grid,
   .signal-layout,
-  .signal-bottom-grid {
+  .signal-bottom-grid,
+  .editor-summary,
+  .run-history-list {
     grid-template-columns: 1fr;
   }
 

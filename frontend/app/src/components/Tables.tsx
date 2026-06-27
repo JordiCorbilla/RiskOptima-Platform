@@ -35,7 +35,7 @@ export function StressScenarioTable({ report }: { report: RiskReport }) {
   );
 }
 
-export function PortfolioDetailsTable({ report }: { report: RiskReport }) {
+export function PortfolioDetailsTable({ report, onSelectSymbol }: { report: RiskReport; onSelectSymbol?: (symbol: string) => void }) {
   return (
     <section className="panel">
       <div className="panel-heading">
@@ -57,7 +57,11 @@ export function PortfolioDetailsTable({ report }: { report: RiskReport }) {
           <tbody>
             {report.positions.map((position) => (
               <tr key={String(position.symbol)}>
-                <td>{position.symbol}</td>
+                <td>
+                  <button className="link-button" onClick={() => onSelectSymbol?.(String(position.symbol))}>
+                    {position.symbol}
+                  </button>
+                </td>
                 <td>{position.name}</td>
                 <td>{position.asset_class}</td>
                 <td>{position.sector}</td>

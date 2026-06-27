@@ -10,13 +10,14 @@ from app.domain.models import (
     PortfolioSummary,
     PortfolioUpdateRequest,
     RiskReport,
+    RunSummary,
     ScenarioResult,
     ScenarioRunRequest,
     StressScenario,
 )
 from app.repositories.portfolio_repository import PortfolioRepository
 from app.services.portfolio_service import parse_portfolio_csv
-from app.services.generation_service import generate_portfolio_run
+from app.services.generation_service import generate_portfolio_run, list_portfolio_runs
 from app.services.notebook_service import build_notebook_workbench
 from app.services.render_service import build_rendered_charts
 from app.services.risk_service import build_portfolio_risk_report
@@ -103,6 +104,17 @@ def generate_portfolio(
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.get("/portfolios/{portfolio_id}/runs", response_model=list[RunSummary])
+def get_portfolio_runs(
+    portfolio_id: int,
+    repository: PortfolioRepository = Depends(get_portfolio_repository),
+) -> list[RunSummary]:
+    portfolio = repository.get(portfolio_id)
+    if portfolio is None:
+        raise HTTPException(status_code=404, detail="Portfolio not found")
+    return list_portfolio_runs(portfolio_id)
 
 
 @router.get("/portfolios/{portfolio_id}/renders")

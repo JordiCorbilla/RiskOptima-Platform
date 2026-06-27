@@ -102,6 +102,21 @@ export interface GeneratedRun {
   charts: RenderedChart[];
 }
 
+export interface RunSummary {
+  portfolio_id: number;
+  run_id: string;
+  start_date: string;
+  as_of_date: string;
+  generated_at: string;
+  analytics_engine: {
+    name?: string;
+    package?: string;
+    version?: string | null;
+    installed?: boolean;
+    source?: string | null;
+  };
+}
+
 export interface SignalPoint {
   date: string;
   close: number;

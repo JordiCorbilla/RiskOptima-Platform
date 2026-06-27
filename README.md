@@ -82,6 +82,8 @@ npm run dev
 
 Open `http://localhost:5173` and upload `sample_data/institutional_portfolio.csv`. The UI lets you edit positions, save the portfolio definition, choose a start date and as-of date, generate a cached run, or force a recalculation.
 
+The dashboard includes section tabs, portfolio validation, run-progress feedback, cached run history, and clickable instrument drilldowns for signal, VaR contribution, and stress-impact inspection.
+
 ## Storage and Run Dates
 
 Portfolio definitions are stored in SQLite at `backend/riskoptima_platform.db` by default. The repository interface keeps persistence isolated so PostgreSQL can be added later without changing the API or analytics services.

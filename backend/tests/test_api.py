@@ -83,6 +83,12 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     assert generated["cache_hit"] is False
     assert len(generated["charts"]) == 5
 
+    runs_response = client.get(f"{get_settings().api_prefix}/portfolios/{portfolio_id}/runs")
+    assert runs_response.status_code == 200
+    runs = runs_response.json()
+    assert runs[0]["run_id"] == generated["run_id"]
+    assert runs[0]["analytics_engine"]["package"] == "riskoptima"
+
     cached_response = client.post(
         f"{get_settings().api_prefix}/portfolios/{portfolio_id}/generate",
         json={"start_date": "2024-06-26", "as_of_date": "2026-06-28"},

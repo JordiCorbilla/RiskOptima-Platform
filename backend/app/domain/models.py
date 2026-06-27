@@ -139,3 +139,12 @@ class GeneratedRun(BaseModel):
     cache_hit: bool
     report: RiskReport
     charts: list[dict[str, str]]
+
+
+class RunSummary(BaseModel):
+    portfolio_id: int
+    run_id: str
+    start_date: date
+    as_of_date: date
+    generated_at: datetime
+    analytics_engine: dict[str, Any] = Field(default_factory=dict)
