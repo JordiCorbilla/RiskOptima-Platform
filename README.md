@@ -10,6 +10,18 @@ Desktop dashboard:
 
 ![RiskOptima Platform desktop dashboard](docs/screenshots/dashboard-desktop.png)
 
+Live PyPI-backed run showing the analytics engine:
+
+![RiskOptima 2.3.5 engine summary](docs/screenshots/live-engine-summary-riskoptima-235.png)
+
+Risk dashboard in action:
+
+![RiskOptima live risk dashboard](docs/screenshots/live-risk-dashboard-riskoptima-235.png)
+
+Efficient frontier and allocation comparison:
+
+![RiskOptima efficient frontier dashboard](docs/screenshots/live-efficient-frontier-riskoptima-235.png)
+
 Mobile dashboard:
 
 ![RiskOptima Platform mobile dashboard](docs/screenshots/dashboard-mobile.png)
