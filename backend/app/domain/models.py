@@ -113,6 +113,7 @@ class RiskReport(BaseModel):
     portfolio_id: int
     portfolio_name: str
     generated_at: datetime
+    analytics_engine: dict[str, Any] = Field(default_factory=dict)
     metrics: list[RiskMetric]
     var_cvar: list[ChartPoint]
     drawdown: list[ChartPoint]

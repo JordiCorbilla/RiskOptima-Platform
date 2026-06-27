@@ -9,7 +9,7 @@ from app.core.config import get_settings
 from app.domain.models import GeneratedRun, Portfolio
 from app.services.market_data_service import as_business_day, default_start_date, previous_business_day
 from app.services.render_service import build_rendered_charts
-from app.services.risk_service import build_portfolio_risk_report
+from app.services.risk_service import build_portfolio_risk_report, riskoptima_engine_metadata
 
 
 def resolve_run_dates(start_date: date | None = None, as_of_date: date | None = None) -> tuple[date, date]:
@@ -21,11 +21,15 @@ def resolve_run_dates(start_date: date | None = None, as_of_date: date | None = 
 
 
 def _run_id(portfolio: Portfolio, start_date: date, as_of_date: date) -> str:
+    engine = riskoptima_engine_metadata()
     payload = {
         "portfolio": portfolio.model_dump(mode="json"),
         "start_date": start_date.isoformat(),
         "as_of_date": as_of_date.isoformat(),
-        "engine": "riskoptima-platform-v1",
+        "engine": {
+            "platform": "riskoptima-platform-v1",
+            "riskoptima": engine["version"],
+        },
     }
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()[:16]
 
@@ -75,6 +79,7 @@ def generate_portfolio_run(
                 "start_date": resolved_start.isoformat(),
                 "as_of_date": resolved_as_of.isoformat(),
                 "generated_at": generated_at.isoformat(),
+                "analytics_engine": report.analytics_engine,
             },
             indent=2,
         ),

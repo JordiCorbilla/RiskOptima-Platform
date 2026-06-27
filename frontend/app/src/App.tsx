@@ -408,6 +408,10 @@ export function App() {
                 <span>Base Currency</span>
                 <strong>{selectedPortfolio?.base_currency ?? "USD"}</strong>
               </div>
+              <div>
+                <span>Analytics Engine</span>
+                <strong>{report.analytics_engine?.version ? `RiskOptima ${report.analytics_engine.version}` : "RiskOptima"}</strong>
+              </div>
             </section>
 
             <section className="metric-grid">

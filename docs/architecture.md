@@ -50,7 +50,9 @@ Generated artifacts are kept outside SQLite because rendered chart payloads are 
 - `charts.json`
 - `metadata.json`
 
-The cache key includes the complete portfolio payload, the resolved start date, the resolved as-of date, and an engine version string. Editing a position naturally creates a new run id, while **Force recalc** overwrites an existing run folder for the same key.
+The cache key includes the complete portfolio payload, the resolved start date, the resolved as-of date, the platform engine version, and the installed RiskOptima package version. Editing a position or upgrading RiskOptima naturally creates a new run id, while **Force recalc** overwrites an existing run folder for the same key.
+
+Every risk report also carries an `analytics_engine` object containing the RiskOptima package name, installed version, and import source. This gives the UI and generated JSON artifacts an audit trail for which library release produced the analytics.
 
 ## Notebook Onboarding Map
 

@@ -1,4 +1,5 @@
 from datetime import date, datetime, timezone
+from importlib.metadata import PackageNotFoundError, version
 from importlib.util import find_spec
 from pathlib import Path
 import sys
@@ -24,6 +25,22 @@ def _ensure_riskoptima_path() -> None:
         if (resolved / "riskoptima").exists() and str(resolved) not in sys.path:
             sys.path.insert(0, str(resolved))
             return
+
+
+def riskoptima_engine_metadata() -> dict[str, str | bool | None]:
+    spec = find_spec("riskoptima")
+    package_version = None
+    try:
+        package_version = version("riskoptima")
+    except PackageNotFoundError:
+        package_version = None
+    return {
+        "name": "RiskOptima",
+        "package": "riskoptima",
+        "version": package_version,
+        "installed": spec is not None,
+        "source": spec.origin if spec and spec.origin else None,
+    }
 
 
 def _build_market_risk_report(returns: pd.DataFrame, weights: pd.Series, benchmark: pd.Series):
@@ -294,6 +311,7 @@ def build_portfolio_risk_report(
         portfolio_id=portfolio.id,
         portfolio_name=portfolio.name,
         generated_at=datetime.now(timezone.utc),
+        analytics_engine=riskoptima_engine_metadata(),
         metrics=risk_metrics,
         var_cvar=var_cvar,
         drawdown=drawdown,

@@ -60,6 +60,7 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     assert risk_response.status_code == 200
     risk = risk_response.json()
     assert risk["portfolio_name"] == "Edited Portfolio"
+    assert risk["analytics_engine"]["package"] == "riskoptima"
     assert len(risk["metrics"]) >= 8
     assert risk["drawdown"]
     assert risk["factor_exposure"]
@@ -78,6 +79,7 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     assert generate_response.status_code == 200
     generated = generate_response.json()
     assert generated["as_of_date"] == "2026-06-26"
+    assert generated["report"]["analytics_engine"]["package"] == "riskoptima"
     assert generated["cache_hit"] is False
     assert len(generated["charts"]) == 5
 

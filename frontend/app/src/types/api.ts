@@ -62,6 +62,13 @@ export interface RiskReport {
   portfolio_id: number;
   portfolio_name: string;
   generated_at: string;
+  analytics_engine: {
+    name?: string;
+    package?: string;
+    version?: string | null;
+    installed?: boolean;
+    source?: string | null;
+  };
   metrics: RiskMetric[];
   var_cvar: ChartPoint[];
   drawdown: ChartPoint[];

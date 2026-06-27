@@ -37,6 +37,7 @@ def test_risk_report_contains_requested_sections():
     report = build_portfolio_risk_report(portfolio)
 
     metric_names = {metric.name for metric in report.metrics}
+    assert report.analytics_engine["package"] == "riskoptima"
     assert {"Historical VaR", "CVaR", "Maximum Drawdown", "Beta", "Annualized Volatility"} <= metric_names
     assert report.var_cvar
     assert report.drawdown

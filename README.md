@@ -78,11 +78,11 @@ Generated analytics are stored separately in `backend/generated_data/portfolio_{
 
 - `report.json`: risk metrics, factor exposure, VaR/CVaR, drawdown, contributors, stress results, and optimization payload.
 - `charts.json`: rendered RiskOptima chart images as data URLs for the UI gallery.
-- `metadata.json`: portfolio id, deterministic run id, start date, as-of date, and generation timestamp.
+- `metadata.json`: portfolio id, deterministic run id, start date, as-of date, generation timestamp, and RiskOptima package metadata.
 
 The default as-of date is `T-1` business day. If today is Monday, the default run date is the previous Friday. If a weekend as-of date is submitted, the backend rolls it back to the previous Friday. The default start date is two years before the as-of date.
 
-The run id is a hash of portfolio details, date range, and engine version. Re-running the same book and dates loads the cache. Use **Force recalc** to refresh all calculations and charts after changing algorithms.
+The run id is a hash of portfolio details, date range, platform engine version, and installed RiskOptima package version. Re-running the same book and dates loads the cache. Use **Force recalc** to refresh all calculations and charts after changing algorithms.
 
 ## Docker
 
@@ -127,6 +127,8 @@ npm test
 ## RiskOptima Integration
 
 The efficient frontier and RiskOptima chart gallery call the RiskOptima package directly. The platform supplies synthetic price data into `plot_efficient_frontier_monte_carlo(..., price_data=..., return_output=True, save_data=False, save_plot=False)` so the UI receives structured frontier points and the rendered library chart without requiring live market downloads.
+
+Risk reports include an `analytics_engine` payload with the RiskOptima package name, installed version, and import source. The dashboard displays the engine version so screenshots and cached artifacts clearly show which library release produced the run.
 
 The signal workbench calls RiskOptima's SMA helpers and backtest engine:
 
