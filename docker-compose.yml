@@ -8,7 +8,6 @@ services:
     volumes:
       - ./backend:/app/backend
       - ./sample_data:/app/sample_data:ro
-      - ../portfolio_risk_kit:/riskoptima:ro
     ports:
       - "8000:8000"
 

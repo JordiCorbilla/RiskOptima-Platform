@@ -1,6 +1,6 @@
 # RiskOptima Platform
 
-Full-stack institutional portfolio risk platform powered by synthetic data and the [RiskOptima](https://github.com/JordiCorbilla/RiskOptima) Python package.
+Full-stack institutional portfolio risk platform powered by synthetic data and the published [RiskOptima](https://pypi.org/project/riskoptima/) Python package.
 
 The platform demonstrates a production-style quant workflow: editable portfolio books, deterministic synthetic market generation, dated portfolio risk runs, VaR/CVaR, drawdown, volatility, beta, factor exposure, marginal VaR, component VaR, RiskOptima efficient frontier analytics, SMA signal intelligence, notebook workbenches, per-instrument drilldowns, and stress testing.
 
@@ -52,12 +52,13 @@ Backend:
 
 ```powershell
 cd backend
-python -m venv .venv
+py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-$env:PYTHONPATH = ".;C:\repo\portfolio_risk_kit"
 uvicorn app.main:app --reload --port 8000
 ```
+
+The backend installs `riskoptima==2.3.5` from PyPI. For local RiskOptima library development only, set `RISKOPTIMA_PLATFORM_RISKOPTIMA_PATH` to a checkout path before starting FastAPI.
 
 Frontend:
 

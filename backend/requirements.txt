@@ -11,5 +11,6 @@ yfinance>=0.2.54
 matplotlib>=3.8.4
 seaborn>=0.13.2
 squarify>=0.4.4
+riskoptima==2.3.5
 pytest>=8.2.0
 httpx>=0.27.0

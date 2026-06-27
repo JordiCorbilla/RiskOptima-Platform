@@ -13,6 +13,9 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     repository = SQLitePortfolioRepository(tmp_path / "test.db")
     settings = get_settings()
     settings.generated_data_path = tmp_path / "generated_data"
+    local_riskoptima = Path("C:/repo/portfolio_risk_kit")
+    if local_riskoptima.exists():
+        settings.riskoptima_path = local_riskoptima
     app.dependency_overrides[get_portfolio_repository] = lambda: repository
     client = TestClient(app)
 

@@ -2,7 +2,7 @@
 name = "riskoptima-platform-backend"
 version = "0.1.0"
 description = "FastAPI backend for the RiskOptima institutional portfolio risk platform."
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.111.0",
     "uvicorn[standard]>=0.30.0",
@@ -17,6 +17,7 @@ dependencies = [
     "matplotlib>=3.8.4",
     "seaborn>=0.13.2",
     "squarify>=0.4.4",
+    "riskoptima==2.3.5",
 ]
 
 [project.optional-dependencies]

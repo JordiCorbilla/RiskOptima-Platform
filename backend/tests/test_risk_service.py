@@ -1,10 +1,16 @@
 from datetime import datetime, timezone
+from pathlib import Path
 
+from app.core.config import get_settings
 from app.domain.models import AssetClass, Instrument, Portfolio, Position
 from app.services.risk_service import build_portfolio_risk_report
 
 
 def test_risk_report_contains_requested_sections():
+    local_riskoptima = Path("C:/repo/portfolio_risk_kit")
+    if local_riskoptima.exists():
+        get_settings().riskoptima_path = local_riskoptima
+
     portfolio = Portfolio(
         id=42,
         name="Synthetic Multi Asset",

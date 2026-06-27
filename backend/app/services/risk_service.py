@@ -1,4 +1,5 @@
 from datetime import date, datetime, timezone
+from importlib.util import find_spec
 from pathlib import Path
 import sys
 
@@ -14,12 +15,10 @@ from app.services.stress_service import DEFAULT_SCENARIOS, run_stress_scenario
 
 
 def _ensure_riskoptima_path() -> None:
+    if find_spec("riskoptima") is not None:
+        return
     configured = get_settings().riskoptima_path
-    candidates = [
-        configured,
-        Path(__file__).resolve().parents[4] / "portfolio_risk_kit",
-        Path("C:/repo/portfolio_risk_kit"),
-    ]
+    candidates = [configured] if configured is not None else []
     for candidate in candidates:
         resolved = candidate.resolve()
         if (resolved / "riskoptima").exists() and str(resolved) not in sys.path:

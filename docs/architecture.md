@@ -6,7 +6,7 @@ RiskOptima Platform is split into four explicit layers:
 2. FastAPI REST API for portfolio ingestion, reports, and scenarios.
 3. Domain and repository layer that persists portfolios to SQLite behind an interface.
 4. Generated-run cache that stores report/chart JSON by deterministic portfolio/date hash.
-5. Analytics layer that uses synthetic market data and RiskOptima market-risk, factor, optimization, and signal/backtest APIs.
+5. Analytics layer that uses synthetic market data and the published RiskOptima package's market-risk, factor, optimization, and signal/backtest APIs.
 
 ```mermaid
 flowchart LR
@@ -64,4 +64,4 @@ Additional notebook surfaces are exposed as a separate workbench rather than ove
 - fixed-income duration/convexity analytics
 - stochastic volatility scenario models
 
-The notebooks that rely on live Yahoo data are represented through deterministic synthetic data and structured payloads. That keeps the flagship demo reproducible while preserving the analytical intent of the library examples.
+The notebooks that rely on live Yahoo data are represented through deterministic synthetic data and structured payloads. That keeps the flagship demo reproducible while preserving the analytical intent of the library examples. Production and Docker installs use `riskoptima==2.3.5` from PyPI; local checkout overrides are reserved for library development.
