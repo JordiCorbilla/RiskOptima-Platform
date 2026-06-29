@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="RiskOptima.EconomicCalendar.Api/RiskOptima.EconomicCalendar.Api.csproj" />
+  <Project Path="RiskOptima.EconomicCalendar.Application/RiskOptima.EconomicCalendar.Application.csproj" />
+  <Project Path="RiskOptima.EconomicCalendar.Domain/RiskOptima.EconomicCalendar.Domain.csproj" />
+  <Project Path="RiskOptima.EconomicCalendar.Infrastructure/RiskOptima.EconomicCalendar.Infrastructure.csproj" />
+  <Project Path="RiskOptima.EconomicCalendar.Tests/RiskOptima.EconomicCalendar.Tests.csproj" />
+</Solution>

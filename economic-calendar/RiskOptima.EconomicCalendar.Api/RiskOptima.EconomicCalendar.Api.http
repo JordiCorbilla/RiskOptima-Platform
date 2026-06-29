@@ -1,0 +1,6 @@
+@RiskOptima.EconomicCalendar.Api_HostAddress = http://localhost:5176
+
+GET {{RiskOptima.EconomicCalendar.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

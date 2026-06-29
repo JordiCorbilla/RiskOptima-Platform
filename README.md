@@ -56,6 +56,7 @@ frontend/app      React TypeScript dashboard
 sample_data       Synthetic CSV portfolios
 docs              Architecture and API documentation
 notebooks         Notebook walkthrough for analytics exploration
+economic-calendar .NET 10 economic calendar module with React/Vite UI
 ```
 
 ## Run Locally

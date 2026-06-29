@@ -1,0 +1,19 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: RiskOptima.EconomicCalendar.Api/Dockerfile
+    ports:
+      - "5176:8080"
+    volumes:
+      - ./data:/app/data
+
+  frontend:
+    build:
+      context: frontend
+    environment:
+      VITE_PROXY_TARGET: http://backend:8080
+    ports:
+      - "5177:5177"
+    depends_on:
+      - backend
