@@ -10,21 +10,25 @@ The platform demonstrates a production-style quant workflow: editable portfolio 
 
 ## Screenshots
 
-Desktop dashboard:
+Portfolio risk overview with the current RiskOptima 2.4.1 engine:
 
 ![RiskOptima Platform desktop dashboard](docs/screenshots/dashboard-desktop.png)
 
-Live PyPI-backed run showing the analytics engine:
-
-![RiskOptima 2.3.5 engine summary](docs/screenshots/live-engine-summary-riskoptima-235.png)
-
 Risk dashboard in action:
 
-![RiskOptima live risk dashboard](docs/screenshots/live-risk-dashboard-riskoptima-235.png)
+![RiskOptima live risk dashboard](docs/screenshots/risk-dashboard-riskoptima-241.png)
 
 Efficient frontier and allocation comparison:
 
-![RiskOptima efficient frontier dashboard](docs/screenshots/live-efficient-frontier-riskoptima-235.png)
+![RiskOptima efficient frontier dashboard](docs/screenshots/efficient-frontier-riskoptima-241.png)
+
+RiskOptima notebook workbench:
+
+![RiskOptima notebook workbench](docs/screenshots/workbench-riskoptima-241.png)
+
+Economic calendar module:
+
+![RiskOptima economic calendar dashboard](docs/screenshots/economic-calendar-dashboard.png)
 
 Mobile dashboard:
 
