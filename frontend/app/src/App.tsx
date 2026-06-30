@@ -268,8 +268,8 @@ export function App() {
     <main className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <span>RiskOptima</span>
-          <strong>Institutional Risk</strong>
+          <img src="/brand/riskoptima-wordmark.png" alt="RiskOptima - Quant Tools. Real Insight." />
+          <span>Institutional quant platform</span>
         </div>
 
         <nav className="platform-menu" aria-label="Platform modules">

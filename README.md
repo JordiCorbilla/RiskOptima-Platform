@@ -1,26 +1,38 @@
 # RiskOptima Platform
 
+<p align="center">
+  <img src="frontend/app/public/brand/riskoptima-wordmark.png" alt="RiskOptima - Quant Tools. Real Insight." width="760" />
+</p>
+
 Full-stack institutional portfolio risk platform powered by synthetic data and the published [RiskOptima](https://pypi.org/project/riskoptima/) Python package.
 
 The platform demonstrates a production-style quant workflow: editable portfolio books, deterministic synthetic market generation, dated portfolio risk runs, VaR/CVaR, drawdown, volatility, beta, factor exposure, marginal VaR, component VaR, RiskOptima efficient frontier analytics, SMA signal intelligence, notebook workbenches, per-instrument drilldowns, and stress testing.
 
 ## Screenshots
 
-Desktop dashboard:
+RiskOptima branded navigation:
+
+![RiskOptima branded sidebar](docs/screenshots/sidebar-brand.png)
+
+Portfolio risk overview with the current RiskOptima 2.4.1 engine:
 
 ![RiskOptima Platform desktop dashboard](docs/screenshots/dashboard-desktop.png)
 
-Live PyPI-backed run showing the analytics engine:
-
-![RiskOptima 2.3.5 engine summary](docs/screenshots/live-engine-summary-riskoptima-235.png)
-
 Risk dashboard in action:
 
-![RiskOptima live risk dashboard](docs/screenshots/live-risk-dashboard-riskoptima-235.png)
+![RiskOptima live risk dashboard](docs/screenshots/risk-dashboard-riskoptima-241.png)
 
 Efficient frontier and allocation comparison:
 
-![RiskOptima efficient frontier dashboard](docs/screenshots/live-efficient-frontier-riskoptima-235.png)
+![RiskOptima efficient frontier dashboard](docs/screenshots/efficient-frontier-riskoptima-241.png)
+
+RiskOptima notebook workbench:
+
+![RiskOptima notebook workbench](docs/screenshots/workbench-riskoptima-241.png)
+
+Economic calendar module:
+
+![RiskOptima economic calendar dashboard](docs/screenshots/economic-calendar-dashboard.png)
 
 Mobile dashboard:
 

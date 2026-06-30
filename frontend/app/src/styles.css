@@ -34,14 +34,21 @@ select {
   gap: 18px;
   padding: 24px;
   color: #f8fafc;
-  background: #121826;
+  background: #000004;
   border-right: 1px solid #263042;
 }
 
 .brand {
   display: grid;
-  gap: 2px;
-  padding-bottom: 8px;
+  gap: 8px;
+  padding-bottom: 10px;
+}
+
+.brand img {
+  display: block;
+  width: min(100%, 238px);
+  height: auto;
+  object-fit: contain;
 }
 
 .brand span,
@@ -57,8 +64,8 @@ select {
   text-transform: uppercase;
 }
 
-.brand strong {
-  font-size: 1.35rem;
+.brand span {
+  color: #aab7c8;
 }
 
 .platform-menu {
