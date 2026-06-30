@@ -7,6 +7,14 @@ export interface PortfolioSummary {
   market_value: number;
 }
 
+export interface SamplePortfolioSummary {
+  slug: string;
+  name: string;
+  filename: string;
+  position_count: number;
+  market_value: number;
+}
+
 export interface Instrument {
   symbol: string;
   name: string;

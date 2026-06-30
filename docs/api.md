@@ -6,6 +6,8 @@ Base URL: `http://127.0.0.1:8000/api`
 | --- | --- | --- |
 | POST | `/portfolios/upload` | Upload a CSV portfolio. |
 | GET | `/portfolios` | List saved portfolios. |
+| GET | `/portfolio-samples` | List bundled CSV sample portfolios. |
+| POST | `/portfolio-samples/{slug}/load` | Save a bundled sample portfolio into SQLite. |
 | GET | `/portfolios/{id}` | Get editable portfolio details. |
 | PUT | `/portfolios/{id}` | Save edited portfolio name, base currency, and positions. |
 | GET | `/portfolios/{id}/risk` | Build the full risk dashboard payload. |
@@ -73,4 +75,4 @@ Recommended columns:
 - `currency`
 - `beta`
 
-See `sample_data/institutional_portfolio.csv`.
+See `sample_data/institutional_portfolio.csv` and `sample_data/vanguard_multi_asset_portfolio.csv`.

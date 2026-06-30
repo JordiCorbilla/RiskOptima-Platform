@@ -8,8 +8,28 @@ import { NotebookWorkbench } from "./components/NotebookWorkbench";
 import { RenderedChartGallery } from "./components/RenderedChartGallery";
 import { RiskCharts } from "./components/RiskCharts";
 import { SignalWorkbench } from "./components/SignalWorkbench";
-import { generatePortfolioRun, getNotebookWorkbench, getPortfolio, getPortfolioSignals, listPortfolioRuns, listPortfolios, updatePortfolio, uploadPortfolio } from "./services/api";
-import type { NotebookWorkbench as NotebookWorkbenchPayload, Portfolio, PortfolioSignalReport, PortfolioSummary, RenderedChart, RiskReport, RunSummary } from "./types/api";
+import {
+  generatePortfolioRun,
+  getNotebookWorkbench,
+  getPortfolio,
+  getPortfolioSignals,
+  listPortfolioRuns,
+  listPortfolios,
+  listSamplePortfolios,
+  loadSamplePortfolio,
+  updatePortfolio,
+  uploadPortfolio
+} from "./services/api";
+import type {
+  NotebookWorkbench as NotebookWorkbenchPayload,
+  Portfolio,
+  PortfolioSignalReport,
+  PortfolioSummary,
+  RenderedChart,
+  RiskReport,
+  RunSummary,
+  SamplePortfolioSummary
+} from "./types/api";
 import { formatCurrency, formatPercent } from "./utils";
 
 const assetClasses = ["Equity", "Fixed Income", "Credit", "Commodity", "Cash", "Alternative"];
@@ -49,6 +69,7 @@ function blankPortfolioRow(): Portfolio["positions"][number] {
 
 export function App() {
   const [portfolios, setPortfolios] = useState<PortfolioSummary[]>([]);
+  const [samplePortfolios, setSamplePortfolios] = useState<SamplePortfolioSummary[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [portfolioDetail, setPortfolioDetail] = useState<Portfolio | null>(null);
   const [report, setReport] = useState<RiskReport | null>(null);
@@ -169,6 +190,7 @@ export function App() {
 
   useEffect(() => {
     refreshPortfolios().catch(() => setStatus("API is not reachable. Start the FastAPI backend on port 8000."));
+    listSamplePortfolios().then(setSamplePortfolios).catch(() => setSamplePortfolios([]));
   }, []);
 
   const selectedPortfolio = useMemo(
@@ -203,6 +225,21 @@ export function App() {
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Upload failed.");
       setStatus(error instanceof Error ? error.message : "Upload failed.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function onLoadSample(slug: string) {
+    setLoading(true);
+    try {
+      const portfolio = await loadSamplePortfolio(slug);
+      await refreshPortfolios(portfolio.id);
+      setErrorMessage(null);
+      setStatus(`Loaded ${portfolio.name}. Generate the dated run when ready.`);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Unable to load sample portfolio.");
+      setStatus(error instanceof Error ? error.message : "Unable to load sample portfolio.");
     } finally {
       setLoading(false);
     }
@@ -301,6 +338,25 @@ export function App() {
           <span>Upload CSV</span>
           <input type="file" accept=".csv" onChange={(event) => onUpload(event.target.files?.[0] ?? null)} />
         </label>
+
+        {samplePortfolios.length ? (
+          <div className="sample-list">
+            <div className="sidebar-heading">Sample portfolios</div>
+            {samplePortfolios.map((portfolio) => (
+              <button
+                key={portfolio.slug}
+                className="sample-button"
+                type="button"
+                onClick={() => onLoadSample(portfolio.slug)}
+                disabled={loading}
+              >
+                <Plus size={15} />
+                <span>{portfolio.name}</span>
+                <small>{portfolio.position_count} lines</small>
+              </button>
+            ))}
+          </div>
+        ) : null}
 
         <div className="portfolio-list">
           <div className="sidebar-heading">Portfolios</div>

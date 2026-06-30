@@ -1,0 +1,12 @@
+symbol,name,asset_class,sector,quantity,price,currency,beta,market_cap
+IE00B50W2R13.IR,Global Bond Index Fund,Fixed Income,Global Bonds,6779,1.00,USD,-0.10,15000000000
+0P0000TKZI.L,LifeStrategy 40% Equity Fund,Alternative,Multi-Asset 40 Equity,16345,1.00,USD,0.40,9000000000
+0P0000TKZO.L,LifeStrategy 100% Equity Fund,Equity,Global Equity,29706,1.00,USD,1.00,11500000000
+0P0000TKZM.L,LifeStrategy 80% Equity Fund,Alternative,Multi-Asset 80 Equity,28003,1.00,USD,0.80,10500000000
+0P00017UWT.L,Target Retirement 2045 Fund,Alternative,Target Retirement,10824,1.00,USD,0.70,7200000000
+0P0000UGLG.L,ESG Developed World All Cap Equity Index Fund,Equity,Developed World ESG,10192,1.00,USD,1.00,4500000000
+0P0000UGLE.L,ESG Developed Europe Index Fund,Equity,Developed Europe ESG,16772,1.00,USD,0.95,3500000000
+0P0000KM22.L,Emerging Markets Stock Index Fund,Equity,Emerging Markets,13338,1.00,USD,1.15,6000000000
+0P0000KM20.L,Pacific ex-Japan Stock Index Fund,Equity,Pacific ex-Japan,11082,1.00,USD,1.05,2000000000
+0P00018XAP.L,FTSE 100 Index Unit Trust,Equity,UK Large Cap,21121,1.00,USD,0.95,8300000000
+0P0000KSPA.L,U.S. Equity Index Fund,Equity,US Equity,19076,1.00,USD,1.00,15600000000

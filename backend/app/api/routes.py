@@ -7,6 +7,7 @@ from app.domain.models import (
     GenerateRunRequest,
     GeneratedRun,
     Portfolio,
+    SamplePortfolioSummary,
     PortfolioSummary,
     PortfolioUpdateRequest,
     RiskReport,
@@ -21,6 +22,7 @@ from app.services.generation_service import generate_portfolio_run, list_portfol
 from app.services.notebook_service import build_notebook_workbench
 from app.services.render_service import build_rendered_charts
 from app.services.risk_service import build_portfolio_risk_report
+from app.services.sample_portfolio_service import get_sample_portfolio, list_sample_portfolios
 from app.services.signal_service import build_signal_report
 from app.services.stress_service import get_scenario, list_scenarios, run_stress_scenario
 
@@ -45,6 +47,23 @@ async def upload_portfolio(
 @router.get("/portfolios", response_model=list[PortfolioSummary])
 def get_portfolios(repository: PortfolioRepository = Depends(get_portfolio_repository)) -> list[PortfolioSummary]:
     return repository.list()
+
+
+@router.get("/portfolio-samples", response_model=list[SamplePortfolioSummary])
+def get_portfolio_samples() -> list[SamplePortfolioSummary]:
+    return list_sample_portfolios()
+
+
+@router.post("/portfolio-samples/{slug}/load", response_model=Portfolio, status_code=201)
+def load_sample_portfolio(
+    slug: str,
+    repository: PortfolioRepository = Depends(get_portfolio_repository),
+) -> Portfolio:
+    try:
+        name, positions = get_sample_portfolio(slug)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return repository.save(name=name, positions=positions)
 
 
 @router.get("/portfolios/{portfolio_id}", response_model=Portfolio)

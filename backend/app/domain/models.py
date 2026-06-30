@@ -60,6 +60,14 @@ class PortfolioSummary(BaseModel):
     market_value: float
 
 
+class SamplePortfolioSummary(BaseModel):
+    slug: str
+    name: str
+    filename: str
+    position_count: int
+    market_value: float
+
+
 class MarketDataPoint(BaseModel):
     date: date
     symbol: str
