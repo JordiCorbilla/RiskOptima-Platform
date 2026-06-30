@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, ExternalLink, LineChart, Plus, RefreshCw, Save, Trash2, UploadCloud } from "lucide-react";
+import { CalendarDays, LineChart, Plus, RefreshCw, Save, Trash2, UploadCloud } from "lucide-react";
+import { EconomicCalendar } from "./components/EconomicCalendar";
 import { InstrumentDrawer } from "./components/InstrumentDrawer";
 import { ContributorsTable, CorrelationMatrixTable, PortfolioDetailsTable, StressScenarioTable } from "./components/Tables";
 import { MetricCard } from "./components/MetricCard";
@@ -13,8 +14,8 @@ import { formatCurrency, formatPercent } from "./utils";
 
 const assetClasses = ["Equity", "Fixed Income", "Credit", "Commodity", "Cash", "Alternative"];
 const sections = ["Overview", "Risk", "Optimization", "Signals", "Stress", "Workbench", "Renders"] as const;
-const economicCalendarUrl = import.meta.env.VITE_ECONOMIC_CALENDAR_URL ?? "http://127.0.0.1:5177";
 type Section = (typeof sections)[number];
+type PlatformModule = "portfolio-risk" | "economic-calendar";
 
 function previousBusinessDateString(base = new Date()) {
   const value = new Date(base);
@@ -58,6 +59,7 @@ export function App() {
   const [selectedInstrument, setSelectedInstrument] = useState<string | null>(null);
   const [runHistory, setRunHistory] = useState<RunSummary[]>([]);
   const [activeSection, setActiveSection] = useState<Section>("Overview");
+  const [activeModule, setActiveModule] = useState<PlatformModule>("portfolio-risk");
   const [runStep, setRunStep] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [uploadName, setUploadName] = useState("Flagship Institutional Portfolio");
@@ -272,15 +274,22 @@ export function App() {
 
         <nav className="platform-menu" aria-label="Platform modules">
           <span className="sidebar-heading">Modules</span>
-          <button className="module-link module-link--active" type="button">
+          <button
+            className={activeModule === "portfolio-risk" ? "module-link module-link--active" : "module-link"}
+            type="button"
+            onClick={() => setActiveModule("portfolio-risk")}
+          >
             <LineChart size={17} />
             <span>Portfolio Risk</span>
           </button>
-          <a className="module-link" href={economicCalendarUrl} target="_blank" rel="noreferrer">
+          <button
+            className={activeModule === "economic-calendar" ? "module-link module-link--active" : "module-link"}
+            type="button"
+            onClick={() => setActiveModule("economic-calendar")}
+          >
             <CalendarDays size={17} />
             <span>Economic Calendar</span>
-            <ExternalLink size={14} />
-          </a>
+          </button>
         </nav>
 
         <label className="field-label" htmlFor="portfolio-name">
@@ -319,6 +328,10 @@ export function App() {
       </aside>
 
       <section className="workspace">
+        {activeModule === "economic-calendar" ? (
+          <EconomicCalendar />
+        ) : (
+          <>
         <header className="topbar">
           <div>
             <p>Portfolio Risk Dashboard</p>
@@ -630,6 +643,8 @@ export function App() {
             <h2>No portfolio loaded</h2>
             <p>Use one of the CSV files in sample_data to create the first synthetic risk report.</p>
           </section>
+        )}
+          </>
         )}
       </section>
     </main>

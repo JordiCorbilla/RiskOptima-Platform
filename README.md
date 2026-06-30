@@ -81,7 +81,7 @@ npm install
 npm run dev
 ```
 
-To show the Economic Calendar from the portfolio dashboard menu, run the calendar module on `http://127.0.0.1:5177` or set `VITE_ECONOMIC_CALENDAR_URL` before starting the main frontend.
+The Economic Calendar is available from the main dashboard module menu. Run the .NET calendar backend on `http://127.0.0.1:5176`; the main Vite app proxies `/calendar-api` to it.
 
 Open `http://localhost:5173` and upload `sample_data/institutional_portfolio.csv`. The UI lets you edit positions, save the portfolio definition, choose a start date and as-of date, generate a cached run, or force a recalculation.
 

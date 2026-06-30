@@ -7,7 +7,12 @@ export default defineConfig({
     port: 5173,
     allowedHosts: [".trycloudflare.com", "127.0.0.1", "localhost"],
     proxy: {
-      "/api": process.env.VITE_PROXY_TARGET ?? "http://127.0.0.1:8000"
+      "/api": process.env.VITE_PROXY_TARGET ?? "http://127.0.0.1:8000",
+      "/calendar-api": {
+        target: process.env.VITE_CALENDAR_PROXY_TARGET ?? "http://127.0.0.1:5176",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/calendar-api/, "/api")
+      }
     }
   },
   test: {
