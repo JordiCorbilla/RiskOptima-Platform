@@ -61,6 +61,36 @@ select {
   font-size: 1.35rem;
 }
 
+.platform-menu {
+  display: grid;
+  gap: 8px;
+}
+
+.module-link {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #344154;
+  border-radius: 6px;
+  color: #dbe4ef;
+  text-align: left;
+  text-decoration: none;
+  background: #1b2433;
+}
+
+.module-link--active {
+  border-color: #69a1ff;
+  color: #ffffff;
+  background: #263853;
+}
+
+.module-link svg:last-child {
+  color: #91a0b8;
+}
+
 .field-label {
   margin-bottom: -12px;
   color: #cbd5e1;

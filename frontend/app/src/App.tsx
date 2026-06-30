@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, Plus, RefreshCw, Save, Trash2, UploadCloud } from "lucide-react";
+import { CalendarDays, ExternalLink, LineChart, Plus, RefreshCw, Save, Trash2, UploadCloud } from "lucide-react";
 import { InstrumentDrawer } from "./components/InstrumentDrawer";
 import { ContributorsTable, CorrelationMatrixTable, PortfolioDetailsTable, StressScenarioTable } from "./components/Tables";
 import { MetricCard } from "./components/MetricCard";
@@ -13,6 +13,7 @@ import { formatCurrency, formatPercent } from "./utils";
 
 const assetClasses = ["Equity", "Fixed Income", "Credit", "Commodity", "Cash", "Alternative"];
 const sections = ["Overview", "Risk", "Optimization", "Signals", "Stress", "Workbench", "Renders"] as const;
+const economicCalendarUrl = import.meta.env.VITE_ECONOMIC_CALENDAR_URL ?? "http://127.0.0.1:5177";
 type Section = (typeof sections)[number];
 
 function previousBusinessDateString(base = new Date()) {
@@ -268,6 +269,19 @@ export function App() {
           <span>RiskOptima</span>
           <strong>Institutional Risk</strong>
         </div>
+
+        <nav className="platform-menu" aria-label="Platform modules">
+          <span className="sidebar-heading">Modules</span>
+          <button className="module-link module-link--active" type="button">
+            <LineChart size={17} />
+            <span>Portfolio Risk</span>
+          </button>
+          <a className="module-link" href={economicCalendarUrl} target="_blank" rel="noreferrer">
+            <CalendarDays size={17} />
+            <span>Economic Calendar</span>
+            <ExternalLink size={14} />
+          </a>
+        </nav>
 
         <label className="field-label" htmlFor="portfolio-name">
           Portfolio name
