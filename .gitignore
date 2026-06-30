@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+.pytest_cache/
+.venv/
+*.py[cod]
+*.db
+*.log
+tools/
+backend/generated_data/
+
+# Node
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Local environment
+.env
+.DS_Store
+BLOG_POST_RISKOPTIMA_PLATFORM.md

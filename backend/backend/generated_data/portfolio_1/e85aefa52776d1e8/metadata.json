@@ -1,0 +1,14 @@
+{
+  "portfolio_id": 1,
+  "run_id": "e85aefa52776d1e8",
+  "start_date": "2024-06-28",
+  "as_of_date": "2026-06-29",
+  "generated_at": "2026-06-30T17:35:20.131720+00:00",
+  "analytics_engine": {
+    "name": "RiskOptima",
+    "package": "riskoptima",
+    "version": "2.4.1",
+    "installed": true,
+    "source": "C:\\repo\\RiskOptima-Platform\\backend\\.venv\\Lib\\site-packages\\riskoptima\\__init__.py"
+  }
+}

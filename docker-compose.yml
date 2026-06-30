@@ -1,0 +1,21 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      RISKOPTIMA_PLATFORM_CORS_ORIGINS: '["http://localhost:5173","http://localhost:8080"]'
+    volumes:
+      - ./backend:/app/backend
+      - ./sample_data:/app/sample_data:ro
+    ports:
+      - "8000:8000"
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/app/Dockerfile
+    depends_on:
+      - api
+    ports:
+      - "8080:80"

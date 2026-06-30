@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RiskOptima.EconomicCalendar.Application\RiskOptima.EconomicCalendar.Application.csproj" />
+    <ProjectReference Include="..\RiskOptima.EconomicCalendar.Infrastructure\RiskOptima.EconomicCalendar.Infrastructure.csproj" />
+    <ProjectReference Include="..\RiskOptima.EconomicCalendar.Domain\RiskOptima.EconomicCalendar.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

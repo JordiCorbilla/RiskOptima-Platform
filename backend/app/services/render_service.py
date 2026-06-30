@@ -1,0 +1,171 @@
+from __future__ import annotations
+
+import base64
+from datetime import date
+from io import BytesIO
+
+import matplotlib
+
+matplotlib.use("Agg")
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import squarify
+
+from app.domain.models import Portfolio
+from app.services.market_data_service import generate_synthetic_market_data
+from app.services.risk_service import _optimize_portfolio
+from app.services.risk_service import _ensure_riskoptima_path
+
+
+def _png_data_url(fig: plt.Figure) -> str:
+    buffer = BytesIO()
+    fig.savefig(buffer, format="png", dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    encoded = base64.b64encode(buffer.getvalue()).decode("ascii")
+    return f"data:image/png;base64,{encoded}"
+
+
+def _portfolio_weights(portfolio: Portfolio) -> pd.Series:
+    values = pd.Series({position.instrument.symbol: position.market_value for position in portfolio.positions})
+    return values / values.sum()
+
+
+def _portfolio_area_chart(portfolio: Portfolio, returns: pd.DataFrame, weights: pd.Series) -> dict[str, str]:
+    recent_returns = returns.tail(5).add(1.0).prod().sub(1.0).reindex(weights.index)
+    min_value = float(recent_returns.min())
+    max_value = float(recent_returns.max())
+    if np.isclose(min_value, max_value):
+        min_value -= 0.0001
+        max_value += 0.0001
+    norm = matplotlib.colors.Normalize(vmin=min_value, vmax=max_value)
+    colors = [matplotlib.cm.RdYlGn(norm(value)) for value in recent_returns]
+    labels = [
+        f"{symbol}\n{recent_returns[symbol] * 100:+.2f}%\nAllocation: {weights[symbol] * 100:.1f}%"
+        for symbol in weights.index
+    ]
+
+    fig, ax = plt.subplots(figsize=(16, 9))
+    squarify.plot(
+        sizes=(weights * 100).values,
+        label=labels,
+        color=colors,
+        alpha=0.86,
+        ax=ax,
+        edgecolor="#4f4f4f",
+        linewidth=1.5,
+        text_kwargs={"fontsize": 9, "weight": "bold"},
+    )
+    ax.set_title("[RiskOptima] Portfolio Area Chart: 5-Day Synthetic Returns", fontsize=16, pad=18)
+    ax.axis("off")
+    cbar_ax = fig.add_axes([0.92, 0.16, 0.02, 0.68])
+    scalar_map = matplotlib.cm.ScalarMappable(cmap=matplotlib.cm.RdYlGn, norm=norm)
+    plt.colorbar(scalar_map, cax=cbar_ax).set_label("5-Day Return", fontsize=10)
+    return {"title": "Portfolio Area Chart", "description": "RiskOptima-style allocation map with recent synthetic returns.", "image": _png_data_url(fig)}
+
+
+def _correlation_heatmap(returns: pd.DataFrame) -> dict[str, str]:
+    fig, ax = plt.subplots(figsize=(14, 10))
+    sns.heatmap(
+        returns.corr(),
+        annot=True,
+        fmt=".2f",
+        cmap="crest",
+        center=0,
+        linewidths=0.3,
+        linecolor="gray",
+        square=True,
+        cbar_kws={"label": "Correlation"},
+        ax=ax,
+    )
+    ax.set_title("[RiskOptima] Correlation Matrix - Synthetic Market Data", fontsize=16, pad=16)
+    ax.tick_params(axis="x", rotation=90)
+    ax.tick_params(axis="y", rotation=0)
+    return {"title": "Correlation Matrix", "description": "RiskOptima heatmap treatment rendered from synthetic returns.", "image": _png_data_url(fig)}
+
+
+def _riskoptima_efficient_frontier_chart(returns: pd.DataFrame, weights: pd.Series) -> dict[str, str]:
+    symbols = list(weights.index)
+    price_data = (1.0 + returns.reindex(columns=symbols)).cumprod() * 100.0
+    benchmark_returns = returns.reindex(columns=symbols).mean(axis=1)
+    benchmark_return = float((1.0 + benchmark_returns).prod() ** (252 / len(benchmark_returns)) - 1.0)
+    benchmark_volatility = float(benchmark_returns.std(ddof=0) * np.sqrt(252))
+    benchmark_sharpe = float(benchmark_return / benchmark_volatility) if benchmark_volatility else 0.0
+    asset_table = pd.DataFrame({"Asset": symbols, "Weight": weights.reindex(symbols).values, "Label": symbols})
+
+    _ensure_riskoptima_path()
+    from riskoptima import RiskOptima
+
+    output = RiskOptima.plot_efficient_frontier_monte_carlo(
+        asset_table=asset_table,
+        start_date=str(returns.index.min().date()),
+        end_date=str(returns.index.max().date()),
+        risk_free_rate=0.0,
+        num_portfolios=1500,
+        market_benchmark="Synthetic Benchmark",
+        show_tables=True,
+        show_plot=False,
+        price_data=price_data,
+        benchmark_statistics=(benchmark_return, benchmark_volatility, benchmark_sharpe),
+        save_data=False,
+        save_plot=False,
+        return_output=True,
+    )
+    return {
+        "title": "Efficient Frontier",
+        "description": "Direct RiskOptima.plot_efficient_frontier_monte_carlo render with supplied synthetic prices.",
+        "image": _png_data_url(output["figure"]),
+    }
+
+
+def _allocation_comparison_chart(optimization: dict) -> dict[str, str]:
+    allocation = pd.DataFrame(optimization["allocation_comparison"]).set_index("symbol")
+    fig, ax = plt.subplots(figsize=(16, 8))
+    allocation.rename(
+        columns={"current": "Current Portfolio", "max_sharpe": "Max Sharpe", "min_variance": "Minimum Variance"}
+    ).plot(kind="bar", ax=ax, color=["#e69a9a", "#9ae69b", "#9ac7e6"], width=0.78)
+    ax.set_title("[RiskOptima] Current vs Optimized Portfolio Weights", fontsize=16, pad=16)
+    ax.set_xlabel("Asset")
+    ax.set_ylabel("Weight")
+    ax.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(1.0))
+    ax.grid(axis="y", linestyle="--", linewidth=0.5, alpha=0.6)
+    ax.legend(loc="upper right")
+    return {"title": "Optimized Weights", "description": "Current, max-Sharpe, and minimum-variance allocations.", "image": _png_data_url(fig)}
+
+
+def _probability_distribution_chart(returns: pd.DataFrame, weights: pd.Series) -> dict[str, str]:
+    portfolio_returns = returns.reindex(columns=weights.index).dot(weights)
+    rng = np.random.default_rng(80_085)
+    horizon_days = 252
+    samples = rng.choice(portfolio_returns.dropna().values, size=(3000, horizon_days), replace=True)
+    final_returns = np.prod(1.0 + samples, axis=1) - 1.0
+    fig, ax = plt.subplots(figsize=(14, 8))
+    ax.hist(final_returns, bins=55, color="#69a1ff", alpha=0.78, edgecolor="#1f2937", linewidth=0.4)
+    ax.axvline(np.percentile(final_returns, 5), color="#cf222e", linestyle="--", label="5th percentile")
+    ax.axvline(np.percentile(final_returns, 50), color="#1f7a3f", linestyle="-", label="Median")
+    ax.set_title("[RiskOptima] Probability Distribution of Final Portfolio Returns", fontsize=16, pad=16)
+    ax.set_xlabel("One-year simulated return")
+    ax.set_ylabel("Frequency")
+    ax.xaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(1.0))
+    ax.grid(axis="y", linestyle="--", linewidth=0.5, alpha=0.6)
+    ax.legend()
+    return {"title": "Probability Analysis", "description": "Notebook-style Monte Carlo distribution of final portfolio returns.", "image": _png_data_url(fig)}
+
+
+def build_rendered_charts(
+    portfolio: Portfolio,
+    start_date: date | None = None,
+    as_of_date: date | None = None,
+) -> list[dict[str, str]]:
+    returns, _ = generate_synthetic_market_data(portfolio, start_date=start_date, as_of_date=as_of_date)
+    weights = _portfolio_weights(portfolio)
+    optimization = _optimize_portfolio(returns, weights)
+    return [
+        _portfolio_area_chart(portfolio, returns, weights),
+        _correlation_heatmap(returns.reindex(columns=weights.index)),
+        _riskoptima_efficient_frontier_chart(returns, weights),
+        _allocation_comparison_chart(optimization),
+        _probability_distribution_chart(returns, weights),
+    ]
