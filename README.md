@@ -10,6 +10,10 @@ The platform demonstrates a production-style quant workflow: editable portfolio 
 
 ## Screenshots
 
+RiskOptima branded navigation:
+
+![RiskOptima branded sidebar](docs/screenshots/sidebar-brand.png)
+
 Portfolio risk overview with the current RiskOptima 2.4.1 engine:
 
 ![RiskOptima Platform desktop dashboard](docs/screenshots/dashboard-desktop.png)
