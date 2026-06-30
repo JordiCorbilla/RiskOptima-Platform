@@ -40,6 +40,16 @@ def _asset_table(portfolio: Portfolio) -> pd.DataFrame:
     )
 
 
+def _portfolio_weights(portfolio: Portfolio) -> pd.Series:
+    market_values = pd.Series({position.instrument.symbol: position.market_value for position in portfolio.positions})
+    return market_values / market_values.sum()
+
+
+def _portfolio_returns(portfolio: Portfolio, returns: pd.DataFrame) -> pd.Series:
+    weights = _portfolio_weights(portfolio)
+    return returns.reindex(columns=weights.index).dot(weights)
+
+
 def _optimization_ml(portfolio: Portfolio, returns: pd.DataFrame) -> dict:
     _ensure_riskoptima_path()
     from riskoptima.optim import Constraints, optimize_max_sharpe, optimize_min_variance
@@ -317,6 +327,132 @@ def _stochastic_vol() -> dict:
     }
 
 
+def _markov_regime_workbench(portfolio: Portfolio, returns: pd.DataFrame) -> dict:
+    _ensure_riskoptima_path()
+    from riskoptima.reporting import build_markov_regime_report
+
+    portfolio_returns = _portfolio_returns(portfolio, returns).dropna()
+    report = build_markov_regime_report(portfolio_returns, input_type="returns", n_regimes=3, n_iter=100, random_state=29)
+    metrics = report.metrics
+    regimes = metrics["regimes"].astype(int)
+    probabilities = metrics["regime_probabilities"]
+    wealth = metrics["wealth"]
+    summary = metrics["regime_summary"]
+    sampled_index = _sample_series(pd.DataFrame({"return": portfolio_returns, "wealth": wealth, "regime": regimes})).index
+
+    series = []
+    for index in sampled_index:
+        row = {
+            "date": pd.Timestamp(index).strftime("%Y-%m-%d"),
+            "return": float(portfolio_returns.loc[index]),
+            "wealth": float(wealth.loc[index]),
+            "regime": int(regimes.loc[index]),
+        }
+        for column in probabilities.columns:
+            regime_number = str(column).split()[-1]
+            row[f"regime_{regime_number}_probability"] = float(probabilities.loc[index, column])
+        series.append(row)
+
+    return {
+        "current_regime": int(regimes.iloc[-1]),
+        "summary": [
+            {
+                "regime": int(index),
+                "count": int(row["count"]),
+                "mean": float(row["mean"]),
+                "volatility": float(row["std"]),
+                "min": float(row["min"]),
+                "max": float(row["max"]),
+                "annualized_return": float(row["mean"] * 252),
+                "annualized_volatility": float(row["std"] * np.sqrt(252)),
+            }
+            for index, row in summary.iterrows()
+        ],
+        "transition_matrix": [
+            {"from": str(left), "to": str(right), "probability": float(value)}
+            for left, row in metrics["transition_matrix"].iterrows()
+            for right, value in row.items()
+        ],
+        "series": series,
+    }
+
+
+def _portfolio_sophistication_workbench(returns: pd.DataFrame) -> dict:
+    _ensure_riskoptima_path()
+    from riskoptima.reporting import build_portfolio_sophistication_report
+
+    report = build_portfolio_sophistication_report(returns, risk_free_rate=0.04)
+    metrics = report.metrics
+    performance = metrics["performance_table"]
+    weights = metrics["weights"]
+
+    def lookup(method: str, row: str, scale: float = 1.0) -> float:
+        value = performance.loc[row, method]
+        return float(value) / scale
+
+    methods = list(weights.columns)
+    return {
+        "performance": [
+            {
+                "method": method,
+                "description": metrics["method_descriptions"].get(method, method),
+                "total_return": lookup(method, "Total Return [%]", 100.0),
+                "annualized_return": lookup(method, "Annualized Return [%]", 100.0),
+                "annualized_volatility": lookup(method, "Annualized Volatility [%]", 100.0),
+                "max_drawdown": lookup(method, "Max Drawdown [%]", 100.0),
+                "sharpe": lookup(method, "Sharpe Ratio"),
+                "calmar": lookup(method, "Calmar Ratio"),
+                "sortino": lookup(method, "Sortino Ratio"),
+                "value_at_risk": lookup(method, "Value at Risk"),
+            }
+            for method in methods
+        ],
+        "weights": [
+            {"symbol": symbol, **{method: float(weights.loc[symbol, method]) for method in methods}}
+            for symbol in weights.index
+        ],
+    }
+
+
+def _volatility_toolkit_workbench(portfolio: Portfolio, returns: pd.DataFrame) -> dict:
+    _ensure_riskoptima_path()
+    from riskoptima.volatility import ewma_volatility, historical_volatility, realized_volatility, rolling_volatility
+
+    portfolio_returns = _portfolio_returns(portfolio, returns).dropna()
+    rolling = rolling_volatility(portfolio_returns, window=21, input_type="returns").dropna()
+    last_21 = portfolio_returns.tail(21)
+    realized = realized_volatility(last_21, input_type="returns") if len(last_21) else np.nan
+
+    asset_rows = []
+    for symbol in returns.columns:
+        asset_series = returns[symbol].dropna()
+        asset_rolling = rolling_volatility(asset_series, window=21, input_type="returns").dropna()
+        asset_rows.append(
+            {
+                "symbol": symbol,
+                "historical_volatility": float(historical_volatility(asset_series, input_type="returns")),
+                "ewma_volatility": float(ewma_volatility(asset_series, input_type="returns")),
+                "latest_rolling_volatility": float(asset_rolling.iloc[-1]) if not asset_rolling.empty else 0.0,
+            }
+        )
+
+    sampled = _sample_series(rolling.to_frame("rolling_volatility"))
+    return {
+        "summary": {
+            "historical_volatility": float(historical_volatility(portfolio_returns, input_type="returns")),
+            "ewma_volatility": float(ewma_volatility(portfolio_returns, input_type="returns")),
+            "realized_volatility_21d": float(realized),
+            "latest_rolling_volatility": float(rolling.iloc[-1]) if not rolling.empty else 0.0,
+            "peak_rolling_volatility": float(rolling.max()) if not rolling.empty else 0.0,
+        },
+        "series": [
+            {"date": pd.Timestamp(index).strftime("%Y-%m-%d"), "rolling_volatility": float(row["rolling_volatility"])}
+            for index, row in sampled.iterrows()
+        ],
+        "assets": sorted(asset_rows, key=lambda row: row["historical_volatility"], reverse=True),
+    }
+
+
 def build_notebook_workbench(portfolio: Portfolio, start_date: date | None = None, as_of_date: date | None = None) -> dict:
     resolved_start, resolved_as_of = _resolve_dates(start_date, as_of_date)
     returns, _ = generate_synthetic_market_data(portfolio, start_date=resolved_start, as_of_date=resolved_as_of)
@@ -332,4 +468,7 @@ def build_notebook_workbench(portfolio: Portfolio, start_date: date | None = Non
         "credit": _credit_workbench(portfolio),
         "bonds": _bond_workbench(portfolio),
         "stochastic_volatility": _stochastic_vol(),
+        "markov_regimes": _markov_regime_workbench(portfolio, returns),
+        "portfolio_sophistication": _portfolio_sophistication_workbench(returns),
+        "volatility_toolkit": _volatility_toolkit_workbench(portfolio, returns),
     }

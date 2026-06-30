@@ -240,4 +240,58 @@ export interface NotebookWorkbench {
       sabr_vol: number;
     }>;
   };
+  markov_regimes: {
+    current_regime: number;
+    summary: Array<{
+      regime: number;
+      count: number;
+      mean: number;
+      volatility: number;
+      min: number;
+      max: number;
+      annualized_return: number;
+      annualized_volatility: number;
+    }>;
+    transition_matrix: Array<{ from: string; to: string; probability: number }>;
+    series: Array<{
+      date: string;
+      return: number;
+      wealth: number;
+      regime: number;
+      regime_0_probability?: number;
+      regime_1_probability?: number;
+      regime_2_probability?: number;
+    }>;
+  };
+  portfolio_sophistication: {
+    performance: Array<{
+      method: string;
+      description: string;
+      total_return: number;
+      annualized_return: number;
+      annualized_volatility: number;
+      max_drawdown: number;
+      sharpe: number;
+      calmar: number;
+      sortino: number;
+      value_at_risk: number;
+    }>;
+    weights: Array<Record<string, number | string>>;
+  };
+  volatility_toolkit: {
+    summary: {
+      historical_volatility: number;
+      ewma_volatility: number;
+      realized_volatility_21d: number;
+      latest_rolling_volatility: number;
+      peak_rolling_volatility: number;
+    };
+    series: Array<{ date: string; rolling_volatility: number }>;
+    assets: Array<{
+      symbol: string;
+      historical_volatility: number;
+      ewma_volatility: number;
+      latest_rolling_volatility: number;
+    }>;
+  };
 }

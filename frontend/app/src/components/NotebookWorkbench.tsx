@@ -64,6 +64,70 @@ export function NotebookWorkbench({ workbench }: { workbench: NotebookWorkbenchP
           </ResponsiveContainer>
         </div>
 
+        <div className="panel chart-panel chart-panel--wide">
+          <div className="panel-heading">
+            <h2>Portfolio Sophistication Methods</h2>
+            <span>RiskOptima 2.4.1</span>
+          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={workbench.portfolio_sophistication.performance}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="method" />
+              <YAxis yAxisId="left" tickFormatter={formatPercent} />
+              <YAxis yAxisId="right" orientation="right" />
+              <Tooltip
+                formatter={(value: number, name: string) =>
+                  name === "sharpe" ? value.toFixed(2) : formatPercent(value)
+                }
+              />
+              <Legend />
+              <Bar yAxisId="left" dataKey="annualized_return" fill="#1f6feb" name="Annualized return" />
+              <Bar yAxisId="left" dataKey="max_drawdown" fill="#cf222e" name="Max drawdown" />
+              <Bar yAxisId="right" dataKey="sharpe" fill="#2da44e" name="Sharpe" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="panel chart-panel">
+          <div className="panel-heading">
+            <h2>Market Regime Probabilities</h2>
+            <span>Current regime {workbench.markov_regimes.current_regime}</span>
+          </div>
+          <ResponsiveContainer width="100%" height={260}>
+            <LineChart data={workbench.markov_regimes.series}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="date" minTickGap={28} />
+              <YAxis tickFormatter={formatPercent} />
+              <Tooltip formatter={(value: number) => formatPercent(value)} />
+              <Legend />
+              <Line type="monotone" dataKey="regime_0_probability" stroke="#1f6feb" dot={false} name="Regime 0" />
+              <Line type="monotone" dataKey="regime_1_probability" stroke="#bf8700" dot={false} name="Regime 1" />
+              <Line type="monotone" dataKey="regime_2_probability" stroke="#cf222e" dot={false} name="Regime 2" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="panel chart-panel">
+          <div className="panel-heading">
+            <h2>Volatility Toolkit</h2>
+            <span>Rolling 21D</span>
+          </div>
+          <div className="notebook-kpi-grid notebook-kpi-grid--compact">
+            <div><span>Historical</span><strong>{formatPercent(workbench.volatility_toolkit.summary.historical_volatility)}</strong></div>
+            <div><span>EWMA</span><strong>{formatPercent(workbench.volatility_toolkit.summary.ewma_volatility)}</strong></div>
+            <div><span>Realized 21D</span><strong>{formatPercent(workbench.volatility_toolkit.summary.realized_volatility_21d)}</strong></div>
+          </div>
+          <ResponsiveContainer width="100%" height={220}>
+            <LineChart data={workbench.volatility_toolkit.series}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="date" minTickGap={28} />
+              <YAxis tickFormatter={formatPercent} />
+              <Tooltip formatter={(value: number) => formatPercent(value)} />
+              <Line type="monotone" dataKey="rolling_volatility" stroke="#8250df" strokeWidth={2} dot={false} name="Rolling vol" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
         <div className="panel chart-panel">
           <div className="panel-heading">
             <h2>IV Term Structure</h2>
@@ -156,6 +220,51 @@ export function NotebookWorkbench({ workbench }: { workbench: NotebookWorkbenchP
                     <td>{bond.macaulay_duration.toFixed(2)}</td>
                     <td>{bond.modified_duration.toFixed(2)}</td>
                     <td>{bond.pvbp.toFixed(4)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="panel">
+          <div className="panel-heading">
+            <h2>Regime Summary</h2>
+            <span>HMM states</span>
+          </div>
+          <div className="table-wrap">
+            <table>
+              <thead><tr><th>Regime</th><th>Count</th><th>Ann Return</th><th>Ann Vol</th><th>Mean</th></tr></thead>
+              <tbody>
+                {workbench.markov_regimes.summary.map((row) => (
+                  <tr key={row.regime}>
+                    <td>{row.regime}</td>
+                    <td>{row.count}</td>
+                    <td>{formatPercent(row.annualized_return)}</td>
+                    <td>{formatPercent(row.annualized_volatility)}</td>
+                    <td>{formatPercent(row.mean)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="panel">
+          <div className="panel-heading">
+            <h2>Asset Volatility</h2>
+            <span>RiskOptima volatility toolkit</span>
+          </div>
+          <div className="table-wrap">
+            <table>
+              <thead><tr><th>Symbol</th><th>Historical</th><th>EWMA</th><th>Latest rolling</th></tr></thead>
+              <tbody>
+                {workbench.volatility_toolkit.assets.slice(0, 10).map((row) => (
+                  <tr key={row.symbol}>
+                    <td>{row.symbol}</td>
+                    <td>{formatPercent(row.historical_volatility)}</td>
+                    <td>{formatPercent(row.ewma_volatility)}</td>
+                    <td>{formatPercent(row.latest_rolling_volatility)}</td>
                   </tr>
                 ))}
               </tbody>

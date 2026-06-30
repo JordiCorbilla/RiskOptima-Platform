@@ -87,6 +87,8 @@ Open `http://localhost:5173` and upload `sample_data/institutional_portfolio.csv
 
 The dashboard includes section tabs, portfolio validation, run-progress feedback, cached run history, and clickable instrument drilldowns for signal, VaR contribution, and stress-impact inspection.
 
+The Workbench tab also surfaces RiskOptima 2.4.1 additions: Markov market-regime probabilities, portfolio sophistication method comparisons, and the volatility toolkit.
+
 ## Storage and Run Dates
 
 Portfolio definitions are stored in SQLite at `backend/riskoptima_platform.db` by default. The repository interface keeps persistence isolated so PostgreSQL can be added later without changing the API or analytics services.

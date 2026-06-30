@@ -540,6 +540,11 @@ select {
   background: #ffffff;
 }
 
+.notebook-kpi-grid--compact {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
 .notebook-kpi-grid span {
   color: #687385;
   font-size: 0.74rem;

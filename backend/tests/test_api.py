@@ -129,6 +129,12 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     assert notebooks["credit"]["obligors"]
     assert notebooks["bonds"]["bonds"]
     assert notebooks["stochastic_volatility"]["paths"]
+    assert notebooks["markov_regimes"]["summary"]
+    assert notebooks["markov_regimes"]["series"]
+    assert notebooks["portfolio_sophistication"]["performance"]
+    assert notebooks["portfolio_sophistication"]["weights"]
+    assert notebooks["volatility_toolkit"]["series"]
+    assert notebooks["volatility_toolkit"]["assets"]
 
     scenarios_response = client.get(f"{get_settings().api_prefix}/scenarios")
     assert scenarios_response.status_code == 200
