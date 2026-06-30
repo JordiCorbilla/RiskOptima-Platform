@@ -1,5 +1,9 @@
 # RiskOptima Platform
 
+<p align="center">
+  <img src="frontend/app/public/brand/riskoptima-wordmark.png" alt="RiskOptima - Quant Tools. Real Insight." width="760" />
+</p>
+
 Full-stack institutional portfolio risk platform powered by synthetic data and the published [RiskOptima](https://pypi.org/project/riskoptima/) Python package.
 
 The platform demonstrates a production-style quant workflow: editable portfolio books, deterministic synthetic market generation, dated portfolio risk runs, VaR/CVaR, drawdown, volatility, beta, factor exposure, marginal VaR, component VaR, RiskOptima efficient frontier analytics, SMA signal intelligence, notebook workbenches, per-instrument drilldowns, and stress testing.
