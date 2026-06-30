@@ -17,7 +17,7 @@ describe("App", () => {
   it("renders the portfolio risk dashboard shell", async () => {
     render(<App />);
 
-    expect(screen.getByText("RiskOptima")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /RiskOptima/i })).toBeInTheDocument();
     expect(screen.getByText("Portfolio Risk Dashboard")).toBeInTheDocument();
     expect(await screen.findByText("No portfolio loaded")).toBeInTheDocument();
   });
