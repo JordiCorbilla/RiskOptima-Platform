@@ -136,12 +136,14 @@ select {
   display: none;
 }
 
-.portfolio-list {
+.portfolio-list,
+.sample-list {
   display: grid;
   gap: 8px;
 }
 
 .portfolio-button,
+.sample-button,
 .icon-button,
 .ghost-button,
 .table-icon-button {
@@ -161,6 +163,33 @@ select {
 
 .portfolio-button small {
   color: #91a0b8;
+}
+
+.sample-button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 10px;
+  color: #dbe4ef;
+  text-align: left;
+  background: #121a28;
+}
+
+.sample-button svg {
+  color: #69a1ff;
+}
+
+.sample-button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sample-button small {
+  color: #91a0b8;
+  white-space: nowrap;
 }
 
 .portfolio-button--active {

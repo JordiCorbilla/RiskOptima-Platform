@@ -1,4 +1,14 @@
-import type { GeneratedRun, NotebookWorkbench, Portfolio, PortfolioSignalReport, PortfolioSummary, RenderedChart, RiskReport, RunSummary } from "../types/api";
+import type {
+  GeneratedRun,
+  NotebookWorkbench,
+  Portfolio,
+  PortfolioSignalReport,
+  PortfolioSummary,
+  RenderedChart,
+  RiskReport,
+  RunSummary,
+  SamplePortfolioSummary
+} from "../types/api";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
@@ -13,6 +23,16 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export function listPortfolios(): Promise<PortfolioSummary[]> {
   return request<PortfolioSummary[]>("/portfolios");
+}
+
+export function listSamplePortfolios(): Promise<SamplePortfolioSummary[]> {
+  return request<SamplePortfolioSummary[]>("/portfolio-samples");
+}
+
+export function loadSamplePortfolio(slug: string): Promise<Portfolio> {
+  return request<Portfolio>(`/portfolio-samples/${slug}/load`, {
+    method: "POST"
+  });
 }
 
 export function getPortfolio(portfolioId: number): Promise<Portfolio> {

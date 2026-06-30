@@ -95,7 +95,7 @@ npm run dev
 
 The Economic Calendar is available from the main dashboard module menu. Run the .NET calendar backend on `http://127.0.0.1:5176`; the main Vite app proxies `/calendar-api` to it.
 
-Open `http://localhost:5173` and upload `sample_data/institutional_portfolio.csv`. The UI lets you edit positions, save the portfolio definition, choose a start date and as-of date, generate a cached run, or force a recalculation.
+Open `http://localhost:5173` and either load a built-in sample portfolio from the sidebar or upload one of the CSV files in `sample_data`, such as `institutional_portfolio.csv` or `vanguard_multi_asset_portfolio.csv`. The UI lets you edit positions, save the portfolio definition, choose a start date and as-of date, generate a cached run, or force a recalculation.
 
 The dashboard includes section tabs, portfolio validation, run-progress feedback, cached run history, and clickable instrument drilldowns for signal, VaR contribution, and stress-impact inspection.
 
@@ -127,6 +127,8 @@ The API runs on `http://localhost:8000`; the containerized frontend is exposed o
 
 - `POST /api/portfolios/upload`
 - `GET /api/portfolios`
+- `GET /api/portfolio-samples`
+- `POST /api/portfolio-samples/{slug}/load`
 - `GET /api/portfolios/{id}`
 - `PUT /api/portfolios/{id}`
 - `GET /api/portfolios/{id}/risk`

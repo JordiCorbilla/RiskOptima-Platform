@@ -4,6 +4,8 @@ import { App } from "./App";
 
 vi.mock("./services/api", () => ({
   listPortfolios: vi.fn().mockResolvedValue([]),
+  listSamplePortfolios: vi.fn().mockResolvedValue([]),
+  loadSamplePortfolio: vi.fn(),
   getPortfolio: vi.fn(),
   updatePortfolio: vi.fn(),
   generatePortfolioRun: vi.fn(),

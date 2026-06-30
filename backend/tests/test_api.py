@@ -38,6 +38,16 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     assert list_response.status_code == 200
     assert list_response.json()[0]["position_count"] == 3
 
+    samples_response = client.get(f"{get_settings().api_prefix}/portfolio-samples")
+    assert samples_response.status_code == 200
+    samples = samples_response.json()
+    assert any(sample["slug"] == "vanguard_multi_asset_portfolio" for sample in samples)
+
+    sample_load_response = client.post(f"{get_settings().api_prefix}/portfolio-samples/vanguard_multi_asset_portfolio/load")
+    assert sample_load_response.status_code == 201
+    assert sample_load_response.json()["name"] == "Vanguard Multi-Asset Model"
+    assert len(sample_load_response.json()["positions"]) == 11
+
     detail_response = client.get(f"{get_settings().api_prefix}/portfolios/{portfolio_id}")
     assert detail_response.status_code == 200
     detail = detail_response.json()
