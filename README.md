@@ -71,7 +71,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
-The backend installs `riskoptima==2.3.5` from PyPI. For local RiskOptima library development only, set `RISKOPTIMA_PLATFORM_RISKOPTIMA_PATH` to a checkout path before starting FastAPI.
+The backend installs `riskoptima==2.4.1` from PyPI. For local RiskOptima library development only, set `RISKOPTIMA_PLATFORM_RISKOPTIMA_PATH` to a checkout path before starting FastAPI.
 
 Frontend:
 

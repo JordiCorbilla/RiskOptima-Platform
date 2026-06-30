@@ -66,4 +66,4 @@ Additional notebook surfaces are exposed as a separate workbench rather than ove
 - fixed-income duration/convexity analytics
 - stochastic volatility scenario models
 
-The notebooks that rely on live Yahoo data are represented through deterministic synthetic data and structured payloads. That keeps the flagship demo reproducible while preserving the analytical intent of the library examples. Production and Docker installs use `riskoptima==2.3.5` from PyPI; local checkout overrides are reserved for library development.
+The notebooks that rely on live Yahoo data are represented through deterministic synthetic data and structured payloads. That keeps the flagship demo reproducible while preserving the analytical intent of the library examples. Production and Docker installs use `riskoptima==2.4.1` from PyPI; local checkout overrides are reserved for library development.
