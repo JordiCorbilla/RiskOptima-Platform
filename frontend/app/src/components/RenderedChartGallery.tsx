@@ -14,6 +14,9 @@ export function RenderedChartGallery({ charts, loading }: { charts: RenderedChar
             <h2>{chart.title}</h2>
             <span>{chart.description}</span>
           </div>
+          <p className="chart-note">
+            Rendered directly from the RiskOptima library so the dashboard can compare structured API output with the package's native chart representation.
+          </p>
           <img src={chart.image} alt={chart.title} />
         </article>
       ))}

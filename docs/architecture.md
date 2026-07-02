@@ -7,6 +7,7 @@ RiskOptima Platform `0.2.0` is split into explicit layers:
 3. Domain and repository layer that persists portfolios to SQLite behind an interface.
 4. Generated-run cache that stores report/chart JSON by deterministic portfolio/date hash.
 5. Analytics layer that uses synthetic market data and the published `riskoptima==2.5.2` package's market-risk, factor, optimization, options, volatility, credit, regime, and signal/backtest APIs.
+6. Deployment layer that can run as a single on-prem Docker Compose stack with Nginx proxying `/api` and `/calendar-api`.
 
 ```mermaid
 flowchart LR
@@ -66,6 +67,8 @@ Every risk report also carries an `analytics_engine` object containing the RiskO
 ## Notebook Onboarding Map
 
 The platform now covers all current RiskOptima notebook angles. The current UI deliberately treats holdings as clickable analytical objects: after a run, users can open an instrument and inspect RiskOptima SMA crossovers, completed trades, current state, volatility, drawdown, and portfolio strategy equity.
+
+Chart panels include concise interpretation notes directly below each chart heading. These notes explain the portfolio mapping, axis intent, and risk question being answered without requiring the user to cross-reference notebook code.
 
 Additional notebook surfaces are exposed as a separate workbench rather than overloaded into the main risk report:
 

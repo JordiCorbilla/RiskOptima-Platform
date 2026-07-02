@@ -4,10 +4,12 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     environment:
-      RISKOPTIMA_PLATFORM_CORS_ORIGINS: '["http://localhost:5173","http://localhost:8080"]'
+      RISKOPTIMA_PLATFORM_CORS_ORIGINS: '["http://localhost:8080","http://127.0.0.1:8080"]'
+      RISKOPTIMA_PLATFORM_DATABASE_PATH: /app/data/riskoptima_platform.db
+      RISKOPTIMA_PLATFORM_GENERATED_DATA_PATH: /app/generated_data
     volumes:
-      - ./backend:/app/backend
-      - ./sample_data:/app/sample_data:ro
+      - riskoptima-sqlite:/app/data
+      - riskoptima-generated-runs:/app/generated_data
     ports:
       - "8000:8000"
 
@@ -17,5 +19,19 @@ services:
       dockerfile: frontend/app/Dockerfile
     depends_on:
       - api
+      - calendar
     ports:
       - "8080:80"
+
+  calendar:
+    build:
+      context: ./economic-calendar
+      dockerfile: RiskOptima.EconomicCalendar.Api/Dockerfile
+    volumes:
+      - ./economic-calendar/data:/app/data
+    ports:
+      - "5176:8080"
+
+volumes:
+  riskoptima-sqlite:
+  riskoptima-generated-runs:

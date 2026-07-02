@@ -75,6 +75,9 @@ export function SignalWorkbench({
               </div>
             </div>
 
+            <p className="chart-note">
+              Plots the selected holding against short and long SMA bands. Green markers show buy crossovers and red markers show sell crossovers produced by the RiskOptima SMA signal frame.
+            </p>
             <ResponsiveContainer width="100%" height={330}>
               <ComposedChart data={detail.signals}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -129,15 +132,20 @@ export function SignalWorkbench({
                   </tbody>
                 </table>
               </div>
-              <ResponsiveContainer width="100%" height={220}>
-                <LineChart data={signalReport.portfolio_equity}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="date" minTickGap={28} />
-                  <YAxis domain={["dataMin", "dataMax"]} tickFormatter={(value: number) => `$${(value / 1_000_000).toFixed(1)}M`} />
-                  <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                  <Line type="monotone" dataKey="value" stroke="#2da44e" strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
+              <div className="mini-chart-block">
+                <p className="chart-note">
+                  Aggregates each holding's SMA strategy into a portfolio equity curve so the signal logic can be evaluated at book level.
+                </p>
+                <ResponsiveContainer width="100%" height={220}>
+                  <LineChart data={signalReport.portfolio_equity}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="date" minTickGap={28} />
+                    <YAxis domain={["dataMin", "dataMax"]} tickFormatter={(value: number) => `$${(value / 1_000_000).toFixed(1)}M`} />
+                    <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                    <Line type="monotone" dataKey="value" stroke="#2da44e" strokeWidth={2} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
         ) : null}

@@ -2,6 +2,7 @@ from datetime import date
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 
+from app.core.version import PLATFORM_VERSION
 from app.db.session import get_portfolio_repository
 from app.domain.models import (
     BacktestRunRequest,
@@ -37,6 +38,16 @@ from app.services.signal_service import build_signal_report
 from app.services.stress_service import get_scenario, list_scenarios, run_stress_scenario
 
 router = APIRouter()
+
+
+@router.get("/health")
+def get_health() -> dict[str, str]:
+    metadata = get_library_metadata()
+    return {
+        "status": "ok",
+        "platform_version": PLATFORM_VERSION,
+        "riskoptima_version": metadata.installed_version,
+    }
 
 
 @router.get("/library/metadata", response_model=LibraryMetadata)

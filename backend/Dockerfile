@@ -7,7 +7,9 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 COPY backend /app/backend
 COPY sample_data /app/sample_data
 ENV PYTHONPATH=/app/backend
-ENV RISKOPTIMA_PLATFORM_DATABASE_PATH=/app/backend/riskoptima_platform.db
+ENV RISKOPTIMA_PLATFORM_DATABASE_PATH=/app/data/riskoptima_platform.db
+ENV RISKOPTIMA_PLATFORM_GENERATED_DATA_PATH=/app/generated_data
+RUN mkdir -p /app/data /app/generated_data
 
 EXPOSE 8000
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

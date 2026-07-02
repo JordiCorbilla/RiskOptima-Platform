@@ -4,6 +4,7 @@ Base URL: `http://127.0.0.1:8000/api`
 
 | Method | Path | Purpose |
 | --- | --- | --- |
+| GET | `/health` | Return operational health, platform version, and RiskOptima package version. |
 | POST | `/portfolios/upload` | Upload a CSV portfolio. |
 | GET | `/portfolios` | List saved portfolios. |
 | GET | `/portfolio-samples` | List bundled CSV sample portfolios. |
@@ -39,6 +40,18 @@ Base URL: `http://127.0.0.1:8000/api`
 If dates are omitted, the backend uses a two-year window ending on T-1 business day. Weekend as-of dates are rolled back to Friday. A repeated request with the same portfolio and dates returns `cache_hit: true`; set `force: true` to recalculate and replace the generated artifacts.
 
 Generated runs include `diagnostics` and `metadata` with platform version, RiskOptima package version/source, functions executed, generated code snippets, and stage timings.
+
+## Health
+
+`GET /health`
+
+```json
+{
+  "status": "ok",
+  "platform_version": "0.2.0",
+  "riskoptima_version": "2.5.2"
+}
+```
 
 ## Library Explorer
 

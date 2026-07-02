@@ -464,6 +464,24 @@ select {
   color: #516071;
 }
 
+.chart-note {
+  margin: -4px 0 14px;
+  max-width: 920px;
+  color: #516071;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.mini-chart-block {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.mini-chart-block .chart-note {
+  margin: 0;
+}
+
 .code-panel {
   min-width: 0;
   border: 1px solid #d8dee8;

@@ -34,15 +34,15 @@ Backtest Studio:
 
 Risk dashboard in action:
 
-![RiskOptima live risk dashboard](docs/screenshots/risk-dashboard-riskoptima-241.png)
+![RiskOptima live risk dashboard](docs/screenshots/risk-charts-riskoptima-252.png)
 
 Efficient frontier and allocation comparison:
 
-![RiskOptima efficient frontier dashboard](docs/screenshots/efficient-frontier-riskoptima-241.png)
+![RiskOptima efficient frontier dashboard](docs/screenshots/optimization-riskoptima-252.png)
 
 RiskOptima notebook workbench:
 
-![RiskOptima notebook workbench](docs/screenshots/workbench-riskoptima-241.png)
+![RiskOptima notebook workbench](docs/screenshots/workbench-riskoptima-252.png)
 
 Economic calendar module:
 
@@ -135,10 +135,13 @@ The run id is a hash of portfolio details, date range, platform engine version, 
 docker compose up --build
 ```
 
-The API runs on `http://localhost:8000`; the containerized frontend is exposed on `http://localhost:8080`.
+The containerized frontend is exposed on `http://localhost:8080` and proxies `/api` to FastAPI plus `/calendar-api` to the economic-calendar API. Direct diagnostic ports are also published at `http://localhost:8000` for FastAPI and `http://localhost:5176` for the calendar API.
+
+For a production-style local server setup, see [docs/on-prem-deployment.md](docs/on-prem-deployment.md).
 
 ## API
 
+- `GET /api/health`
 - `POST /api/portfolios/upload`
 - `GET /api/portfolios`
 - `GET /api/portfolio-samples`

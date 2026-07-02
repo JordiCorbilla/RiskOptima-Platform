@@ -29,6 +29,9 @@ export function RiskCharts({ report }: { report: RiskReport }) {
           <h2>VaR / CVaR Loss Distribution</h2>
           <span>Historical simulation</span>
         </div>
+        <p className="chart-note">
+          Shows the left-tail loss profile from the portfolio return simulation. The dashed lines mark the 95% and 99% one-day loss thresholds used for VaR context.
+        </p>
         <ResponsiveContainer width="100%" height={260}>
           <LineChart data={distribution}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -47,6 +50,9 @@ export function RiskCharts({ report }: { report: RiskReport }) {
           <h2>Drawdown</h2>
           <span>Peak-to-trough path</span>
         </div>
+        <p className="chart-note">
+          Tracks the portfolio decline from each prior high-water mark, making the timing and depth of capital erosion visible across the selected run window.
+        </p>
         <ResponsiveContainer width="100%" height={260}>
           <LineChart data={report.drawdown}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -63,6 +69,9 @@ export function RiskCharts({ report }: { report: RiskReport }) {
           <h2>Factor Exposure</h2>
           <span>Weighted regression betas</span>
         </div>
+        <p className="chart-note">
+          Decomposes the current holdings into synthetic factor sensitivities so you can see which macro-style drivers dominate portfolio risk.
+        </p>
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={report.factor_exposure}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -89,6 +98,9 @@ export function OptimizationCharts({ report }: { report: RiskReport }) {
           <h2>Efficient Frontier</h2>
           <span>RiskOptima max-Sharpe / min-variance</span>
         </div>
+        <p className="chart-note">
+          Plots RiskOptima Monte Carlo portfolios by expected return and volatility. Highlighted points identify the current book and optimized candidates.
+        </p>
         <ResponsiveContainer width="100%" height={320}>
           <ScatterChart>
             <CartesianGrid strokeDasharray="3 3" />
@@ -109,6 +121,9 @@ export function OptimizationCharts({ report }: { report: RiskReport }) {
           <h2>Allocation Comparison</h2>
           <span>Current vs optimized weights</span>
         </div>
+        <p className="chart-note">
+          Compares current position weights with RiskOptima max-Sharpe and minimum-variance allocations to show which holdings the optimizer would tilt toward or away from.
+        </p>
         <ResponsiveContainer width="100%" height={320}>
           <BarChart data={report.optimization.allocation_comparison}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />

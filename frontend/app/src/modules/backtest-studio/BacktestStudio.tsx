@@ -144,6 +144,9 @@ export function BacktestStudio({
                 <h2>Equity Curve</h2>
                 <span>RiskOptima run_backtest</span>
               </div>
+              <p className="chart-note">
+                Shows the strategy account value after synthetic signal execution and transaction-cost assumptions, making compounding and path dependency visible.
+              </p>
               <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={result.equity_curve}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -159,6 +162,9 @@ export function BacktestStudio({
                 <h2>Drawdown</h2>
                 <span>Strategy path</span>
               </div>
+              <p className="chart-note">
+                Tracks the strategy's loss from prior peak value; deeper negative readings identify periods where the SMA logic gave back capital.
+              </p>
               <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={result.drawdown_curve}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />

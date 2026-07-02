@@ -19,6 +19,13 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     app.dependency_overrides[get_portfolio_repository] = lambda: repository
     client = TestClient(app)
 
+    health_response = client.get(f"{get_settings().api_prefix}/health")
+    assert health_response.status_code == 200
+    health = health_response.json()
+    assert health["status"] == "ok"
+    assert health["platform_version"]
+    assert health["riskoptima_version"]
+
     csv_payload = (
         "symbol,name,asset_class,sector,quantity,price,currency,beta\n"
         "AAA,Alpha Equity,Equity,Technology,100,50,USD,1.1\n"

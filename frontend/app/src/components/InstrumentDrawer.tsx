@@ -69,6 +69,9 @@ export function InstrumentDrawer({ symbol, report, signalReport, onClose }: Inst
             <h3>SMA Signal Path</h3>
             <span>{signalReport?.as_of_date}</span>
           </div>
+          <p className="chart-note">
+            Shows the holding's synthetic close path with short and long SMA overlays, so the latest signal state can be traced back to price momentum.
+          </p>
           <ResponsiveContainer width="100%" height={230}>
             <ComposedChart data={signal.signals}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
