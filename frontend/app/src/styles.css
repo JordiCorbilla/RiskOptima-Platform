@@ -770,10 +770,14 @@ select {
 
 .panel-heading {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 12px;
+}
+
+.panel-heading > div {
+  min-width: 0;
 }
 
 .panel-heading h2 {
@@ -793,6 +797,52 @@ select {
   background: transparent;
   font-weight: 800;
   cursor: pointer;
+}
+
+.chart-download-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #334155;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.chart-download-button:hover {
+  color: #1f6feb;
+  border-color: #9fc3ff;
+  background: #f7fbff;
+}
+
+.chart-download-button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.chart-download-button--error {
+  color: #9b1c1c;
+  border-color: #ffd0d0;
+  background: #fff8f8;
+}
+
+.chart-note-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.chart-note-row .chart-note {
+  margin: 0;
 }
 
 .run-history {
@@ -1184,6 +1234,12 @@ th {
   }
 
   .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .panel-heading,
+  .chart-note-row {
     align-items: flex-start;
     flex-direction: column;
   }

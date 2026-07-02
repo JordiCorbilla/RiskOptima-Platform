@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import type { PortfolioSignalReport } from "../types/api";
 import { formatCurrency, formatPercent } from "../utils";
+import { ChartDownloadButton } from "./ChartDownloadButton";
 
 export function SignalWorkbench({
   signalReport,
@@ -75,34 +76,39 @@ export function SignalWorkbench({
               </div>
             </div>
 
-            <p className="chart-note">
-              Plots the selected holding against short and long SMA bands. Green markers show buy crossovers and red markers show sell crossovers produced by the RiskOptima SMA signal frame.
-            </p>
-            <ResponsiveContainer width="100%" height={330}>
-              <ComposedChart data={detail.signals}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="date" minTickGap={28} />
-                <YAxis
-                  domain={[(value: number) => Math.floor(value * 0.98), (value: number) => Math.ceil(value * 1.02)]}
-                  tickFormatter={(value: number) => `$${value.toFixed(0)}`}
-                  width={64}
-                />
-                <Tooltip
-                  formatter={(value: number, name: string) =>
-                    name === "signal" ? String(value) : formatCurrency(Number(value))
-                  }
-                />
-                <Line type="monotone" dataKey="close" name="Close" stroke="#172033" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="sma_short" name={`SMA ${signalReport.short_window}`} stroke="#1f6feb" dot={false} />
-                <Line type="monotone" dataKey="sma_long" name={`SMA ${signalReport.long_window}`} stroke="#bf8700" dot={false} />
-                {buySignals.map((point) => (
-                  <ReferenceDot key={`buy-${point.date}`} x={point.date} y={point.close} r={5} fill="#1f7a3f" stroke="#ffffff" />
-                ))}
-                {sellSignals.map((point) => (
-                  <ReferenceDot key={`sell-${point.date}`} x={point.date} y={point.close} r={5} fill="#cf222e" stroke="#ffffff" />
-                ))}
-              </ComposedChart>
-            </ResponsiveContainer>
+            <div className="chart-download-scope">
+              <div className="chart-note-row">
+                <p className="chart-note">
+                  Plots the selected holding against short and long SMA bands. Green markers show buy crossovers and red markers show sell crossovers produced by the RiskOptima SMA signal frame.
+                </p>
+                <ChartDownloadButton filename={`riskoptima-sma-signal-path-${detail.symbol}`} />
+              </div>
+              <ResponsiveContainer width="100%" height={330}>
+                <ComposedChart data={detail.signals}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="date" minTickGap={28} />
+                  <YAxis
+                    domain={[(value: number) => Math.floor(value * 0.98), (value: number) => Math.ceil(value * 1.02)]}
+                    tickFormatter={(value: number) => `$${value.toFixed(0)}`}
+                    width={64}
+                  />
+                  <Tooltip
+                    formatter={(value: number, name: string) =>
+                      name === "signal" ? String(value) : formatCurrency(Number(value))
+                    }
+                  />
+                  <Line type="monotone" dataKey="close" name="Close" stroke="#172033" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="sma_short" name={`SMA ${signalReport.short_window}`} stroke="#1f6feb" dot={false} />
+                  <Line type="monotone" dataKey="sma_long" name={`SMA ${signalReport.long_window}`} stroke="#bf8700" dot={false} />
+                  {buySignals.map((point) => (
+                    <ReferenceDot key={`buy-${point.date}`} x={point.date} y={point.close} r={5} fill="#1f7a3f" stroke="#ffffff" />
+                  ))}
+                  {sellSignals.map((point) => (
+                    <ReferenceDot key={`sell-${point.date}`} x={point.date} y={point.close} r={5} fill="#cf222e" stroke="#ffffff" />
+                  ))}
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
 
             <div className="signal-bottom-grid">
               <div className="table-wrap">
@@ -132,10 +138,13 @@ export function SignalWorkbench({
                   </tbody>
                 </table>
               </div>
-              <div className="mini-chart-block">
-                <p className="chart-note">
-                  Aggregates each holding's SMA strategy into a portfolio equity curve so the signal logic can be evaluated at book level.
-                </p>
+              <div className="mini-chart-block chart-download-scope">
+                <div className="chart-note-row">
+                  <p className="chart-note">
+                    Aggregates each holding's SMA strategy into a portfolio equity curve so the signal logic can be evaluated at book level.
+                  </p>
+                  <ChartDownloadButton filename="riskoptima-sma-portfolio-equity" />
+                </div>
                 <ResponsiveContainer width="100%" height={220}>
                   <LineChart data={signalReport.portfolio_equity}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />

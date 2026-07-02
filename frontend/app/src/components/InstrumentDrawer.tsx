@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import type { PortfolioSignalReport, RiskReport } from "../types/api";
 import { formatCurrency, formatPercent } from "../utils";
+import { ChartDownloadButton } from "./ChartDownloadButton";
 
 interface InstrumentDrawerProps {
   symbol: string;
@@ -66,8 +67,11 @@ export function InstrumentDrawer({ symbol, report, signalReport, onClose }: Inst
       {signal ? (
         <section className="drawer-section">
           <div className="panel-heading">
-            <h3>SMA Signal Path</h3>
-            <span>{signalReport?.as_of_date}</span>
+            <div>
+              <h3>SMA Signal Path</h3>
+              <span>{signalReport?.as_of_date}</span>
+            </div>
+            <ChartDownloadButton filename={`riskoptima-instrument-sma-${symbol}`} />
           </div>
           <p className="chart-note">
             Shows the holding's synthetic close path with short and long SMA overlays, so the latest signal state can be traced back to price momentum.

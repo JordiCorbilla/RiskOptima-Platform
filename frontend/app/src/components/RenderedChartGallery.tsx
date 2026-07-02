@@ -1,4 +1,5 @@
 import type { RenderedChart } from "../types/api";
+import { ChartDownloadButton } from "./ChartDownloadButton";
 
 export function RenderedChartGallery({ charts, loading }: { charts: RenderedChart[]; loading: boolean }) {
   return (
@@ -11,8 +12,11 @@ export function RenderedChartGallery({ charts, loading }: { charts: RenderedChar
       {charts.map((chart) => (
         <article className="panel rendered-chart" key={chart.title}>
           <div className="panel-heading">
-            <h2>{chart.title}</h2>
-            <span>{chart.description}</span>
+            <div>
+              <h2>{chart.title}</h2>
+              <span>{chart.description}</span>
+            </div>
+            <ChartDownloadButton filename={`riskoptima-rendered-${chart.title}`} imageSrc={chart.image} />
           </div>
           <p className="chart-note">
             Rendered directly from the RiskOptima library so the dashboard can compare structured API output with the package's native chart representation.

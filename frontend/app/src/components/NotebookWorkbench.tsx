@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import type { NotebookWorkbench as NotebookWorkbenchPayload } from "../types/api";
 import { formatCurrency, formatPercent } from "../utils";
+import { ChartDownloadButton } from "./ChartDownloadButton";
 
 export function NotebookWorkbench({ workbench }: { workbench: NotebookWorkbenchPayload }) {
   return (
@@ -25,8 +26,11 @@ export function NotebookWorkbench({ workbench }: { workbench: NotebookWorkbenchP
       <div className="chart-grid">
         <div className="panel chart-panel chart-panel--wide">
           <div className="panel-heading">
-            <h2>Mean-Variance + ML Optimization</h2>
-            <span>Notebook 02</span>
+            <div>
+              <h2>Mean-Variance + ML Optimization</h2>
+              <span>Notebook 02</span>
+            </div>
+            <ChartDownloadButton filename="riskoptima-mean-variance-ml-optimization" />
           </div>
           <p className="chart-note">
             Compares the current portfolio weights with RiskOptima optimization outputs and an ML-adjusted allocation, making allocation drift and concentration changes explicit.
@@ -48,8 +52,11 @@ export function NotebookWorkbench({ workbench }: { workbench: NotebookWorkbenchP
 
         <div className="panel chart-panel chart-panel--wide">
           <div className="panel-heading">
-            <h2>Index / Volatility Divergence</h2>
-            <span>Notebook 03</span>
+            <div>
+              <h2>Index / Volatility Divergence</h2>
+              <span>Notebook 03</span>
+            </div>
+            <ChartDownloadButton filename="riskoptima-index-volatility-divergence" />
           </div>
           <p className="chart-note">
             Shows synthetic index level, moving-average bands, and volatility proxy together to surface divergence periods that may precede regime or risk shifts.
@@ -72,8 +79,11 @@ export function NotebookWorkbench({ workbench }: { workbench: NotebookWorkbenchP
 
         <div className="panel chart-panel chart-panel--wide">
           <div className="panel-heading">
-            <h2>Portfolio Sophistication Methods</h2>
-            <span>RiskOptima 2.5.2</span>
+            <div>
+              <h2>Portfolio Sophistication Methods</h2>
+              <span>RiskOptima 2.5.2</span>
+            </div>
+            <ChartDownloadButton filename="riskoptima-portfolio-sophistication-methods" />
           </div>
           <p className="chart-note">
             Benchmarks construction approaches by return, drawdown, and Sharpe so the trade-off between performance and downside risk is visible in one view.
@@ -99,8 +109,11 @@ export function NotebookWorkbench({ workbench }: { workbench: NotebookWorkbenchP
 
         <div className="panel chart-panel">
           <div className="panel-heading">
-            <h2>Market Regime Probabilities</h2>
-            <span>Current regime {workbench.markov_regimes.current_regime}</span>
+            <div>
+              <h2>Market Regime Probabilities</h2>
+              <span>Current regime {workbench.markov_regimes.current_regime}</span>
+            </div>
+            <ChartDownloadButton filename="riskoptima-market-regime-probabilities" />
           </div>
           <p className="chart-note">
             Displays hidden-regime probabilities over time; rising probability in a stressed regime is a signal to review exposure and drawdown risk.
@@ -121,8 +134,11 @@ export function NotebookWorkbench({ workbench }: { workbench: NotebookWorkbenchP
 
         <div className="panel chart-panel">
           <div className="panel-heading">
-            <h2>Volatility Toolkit</h2>
-            <span>Rolling 21D</span>
+            <div>
+              <h2>Volatility Toolkit</h2>
+              <span>Rolling 21D</span>
+            </div>
+            <ChartDownloadButton filename="riskoptima-volatility-toolkit" />
           </div>
           <p className="chart-note">
             Tracks rolling realized volatility against summary estimates, helping distinguish persistent volatility changes from short-lived noise.
@@ -145,8 +161,11 @@ export function NotebookWorkbench({ workbench }: { workbench: NotebookWorkbenchP
 
         <div className="panel chart-panel">
           <div className="panel-heading">
-            <h2>IV Term Structure</h2>
-            <span>Notebook 06</span>
+            <div>
+              <h2>IV Term Structure</h2>
+              <span>Notebook 06</span>
+            </div>
+            <ChartDownloadButton filename="riskoptima-iv-term-structure" />
           </div>
           <p className="chart-note">
             Compares implied volatility by expiry with historical volatility, highlighting where the synthetic option market prices more or less forward uncertainty.
@@ -165,8 +184,11 @@ export function NotebookWorkbench({ workbench }: { workbench: NotebookWorkbenchP
 
         <div className="panel chart-panel">
           <div className="panel-heading">
-            <h2>Greeks Simulator</h2>
-            <span>{workbench.options.symbol}</span>
+            <div>
+              <h2>Greeks Simulator</h2>
+              <span>{workbench.options.symbol}</span>
+            </div>
+            <ChartDownloadButton filename={`riskoptima-greeks-simulator-${workbench.options.symbol}`} />
           </div>
           <p className="chart-note">
             Shows how option sensitivities change by strike, which helps map directional, convexity, time-decay, and volatility exposure for the selected instrument.
@@ -188,8 +210,11 @@ export function NotebookWorkbench({ workbench }: { workbench: NotebookWorkbenchP
 
         <div className="panel chart-panel">
           <div className="panel-heading">
-            <h2>Credit Loss Distribution</h2>
-            <span>Notebook 08</span>
+            <div>
+              <h2>Credit Loss Distribution</h2>
+              <span>Notebook 08</span>
+            </div>
+            <ChartDownloadButton filename="riskoptima-credit-loss-distribution" />
           </div>
           <p className="chart-note">
             Orders synthetic credit loss buckets to show the portfolio tail-loss shape that feeds expected loss, credit VaR, and credit CVaR.
@@ -207,8 +232,11 @@ export function NotebookWorkbench({ workbench }: { workbench: NotebookWorkbenchP
 
         <div className="panel chart-panel">
           <div className="panel-heading">
-            <h2>Stochastic Volatility</h2>
-            <span>Notebook 04</span>
+            <div>
+              <h2>Stochastic Volatility</h2>
+              <span>Notebook 04</span>
+            </div>
+            <ChartDownloadButton filename="riskoptima-stochastic-volatility" />
           </div>
           <p className="chart-note">
             Compares Hull-White, Heston, and SABR-style paths so model-driven volatility assumptions can be inspected side by side.

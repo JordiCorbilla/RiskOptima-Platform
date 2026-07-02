@@ -15,6 +15,7 @@ import {
 } from "recharts";
 import type { RiskReport } from "../types/api";
 import { formatPercent } from "../utils";
+import { ChartDownloadButton } from "./ChartDownloadButton";
 
 export function RiskCharts({ report }: { report: RiskReport }) {
   const factorColors = ["#1f6feb", "#2da44e", "#bf8700", "#cf222e", "#8250df"];
@@ -26,8 +27,11 @@ export function RiskCharts({ report }: { report: RiskReport }) {
     <section className="chart-grid" aria-label="Portfolio risk charts">
       <div className="panel chart-panel">
         <div className="panel-heading">
-          <h2>VaR / CVaR Loss Distribution</h2>
-          <span>Historical simulation</span>
+          <div>
+            <h2>VaR / CVaR Loss Distribution</h2>
+            <span>Historical simulation</span>
+          </div>
+          <ChartDownloadButton filename="riskoptima-var-cvar-loss-distribution" />
         </div>
         <p className="chart-note">
           Shows the left-tail loss profile from the portfolio return simulation. The dashed lines mark the 95% and 99% one-day loss thresholds used for VaR context.
@@ -47,8 +51,11 @@ export function RiskCharts({ report }: { report: RiskReport }) {
 
       <div className="panel chart-panel">
         <div className="panel-heading">
-          <h2>Drawdown</h2>
-          <span>Peak-to-trough path</span>
+          <div>
+            <h2>Drawdown</h2>
+            <span>Peak-to-trough path</span>
+          </div>
+          <ChartDownloadButton filename="riskoptima-drawdown" />
         </div>
         <p className="chart-note">
           Tracks the portfolio decline from each prior high-water mark, making the timing and depth of capital erosion visible across the selected run window.
@@ -66,8 +73,11 @@ export function RiskCharts({ report }: { report: RiskReport }) {
 
       <div className="panel chart-panel chart-panel--wide">
         <div className="panel-heading">
-          <h2>Factor Exposure</h2>
-          <span>Weighted regression betas</span>
+          <div>
+            <h2>Factor Exposure</h2>
+            <span>Weighted regression betas</span>
+          </div>
+          <ChartDownloadButton filename="riskoptima-factor-exposure" />
         </div>
         <p className="chart-note">
           Decomposes the current holdings into synthetic factor sensitivities so you can see which macro-style drivers dominate portfolio risk.
@@ -95,8 +105,11 @@ export function OptimizationCharts({ report }: { report: RiskReport }) {
     <section className="chart-grid" aria-label="Portfolio optimization charts">
       <div className="panel chart-panel chart-panel--wide">
         <div className="panel-heading">
-          <h2>Efficient Frontier</h2>
-          <span>RiskOptima max-Sharpe / min-variance</span>
+          <div>
+            <h2>Efficient Frontier</h2>
+            <span>RiskOptima max-Sharpe / min-variance</span>
+          </div>
+          <ChartDownloadButton filename="riskoptima-efficient-frontier" />
         </div>
         <p className="chart-note">
           Plots RiskOptima Monte Carlo portfolios by expected return and volatility. Highlighted points identify the current book and optimized candidates.
@@ -118,8 +131,11 @@ export function OptimizationCharts({ report }: { report: RiskReport }) {
 
       <div className="panel chart-panel chart-panel--wide">
         <div className="panel-heading">
-          <h2>Allocation Comparison</h2>
-          <span>Current vs optimized weights</span>
+          <div>
+            <h2>Allocation Comparison</h2>
+            <span>Current vs optimized weights</span>
+          </div>
+          <ChartDownloadButton filename="riskoptima-allocation-comparison" />
         </div>
         <p className="chart-note">
           Compares current position weights with RiskOptima max-Sharpe and minimum-variance allocations to show which holdings the optimizer would tilt toward or away from.

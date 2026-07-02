@@ -9,6 +9,7 @@ import {
   XAxis,
   YAxis
 } from "recharts";
+import { ChartDownloadButton } from "../../components/ChartDownloadButton";
 import { runBacktest } from "../../services/api";
 import type { BacktestRunResponse, Portfolio } from "../../types/api";
 import { formatCurrency, formatPercent } from "../../utils";
@@ -141,8 +142,11 @@ export function BacktestStudio({
           <section className="chart-grid">
             <div className="panel chart-panel">
               <div className="panel-heading">
-                <h2>Equity Curve</h2>
-                <span>RiskOptima run_backtest</span>
+                <div>
+                  <h2>Equity Curve</h2>
+                  <span>RiskOptima run_backtest</span>
+                </div>
+                <ChartDownloadButton filename="riskoptima-backtest-equity-curve" />
               </div>
               <p className="chart-note">
                 Shows the strategy account value after synthetic signal execution and transaction-cost assumptions, making compounding and path dependency visible.
@@ -159,8 +163,11 @@ export function BacktestStudio({
             </div>
             <div className="panel chart-panel">
               <div className="panel-heading">
-                <h2>Drawdown</h2>
-                <span>Strategy path</span>
+                <div>
+                  <h2>Drawdown</h2>
+                  <span>Strategy path</span>
+                </div>
+                <ChartDownloadButton filename="riskoptima-backtest-drawdown" />
               </div>
               <p className="chart-note">
                 Tracks the strategy's loss from prior peak value; deeper negative readings identify periods where the SMA logic gave back capital.
