@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, LineChart, Plus, RefreshCw, Save, Trash2, UploadCloud } from "lucide-react";
+import { Activity, BookOpen, CalendarDays, FlaskConical, LineChart, Plus, RefreshCw, Save, Trash2, UploadCloud } from "lucide-react";
 import { EconomicCalendar } from "./components/EconomicCalendar";
 import { InstrumentDrawer } from "./components/InstrumentDrawer";
 import { ContributorsTable, CorrelationMatrixTable, PortfolioDetailsTable, StressScenarioTable } from "./components/Tables";
@@ -8,6 +8,9 @@ import { NotebookWorkbench } from "./components/NotebookWorkbench";
 import { RenderedChartGallery } from "./components/RenderedChartGallery";
 import { OptimizationCharts, RiskCharts } from "./components/RiskCharts";
 import { SignalWorkbench } from "./components/SignalWorkbench";
+import { BacktestStudio } from "./modules/backtest-studio/BacktestStudio";
+import { OptionsWorkbench } from "./modules/options-workbench/OptionsWorkbench";
+import { RiskOptimaExplorer } from "./modules/riskoptima-explorer/RiskOptimaExplorer";
 import {
   generatePortfolioRun,
   getNotebookWorkbench,
@@ -35,7 +38,8 @@ import { formatCurrency, formatPercent } from "./utils";
 const assetClasses = ["Equity", "Fixed Income", "Credit", "Commodity", "Cash", "Alternative"];
 const sections = ["Overview", "Risk", "Optimization", "Signals", "Stress", "Workbench", "Renders"] as const;
 type Section = (typeof sections)[number];
-type PlatformModule = "portfolio-risk" | "economic-calendar";
+type PlatformModule = "portfolio-risk" | "riskoptima-explorer" | "options-workbench" | "backtest-studio" | "economic-calendar";
+const platformVersion = "0.2.0";
 
 function previousBusinessDateString(base = new Date()) {
   const value = new Date(base);
@@ -306,7 +310,7 @@ export function App() {
       <aside className="sidebar">
         <div className="brand">
           <img src="/brand/riskoptima-wordmark.png" alt="RiskOptima - Quant Tools. Real Insight." />
-          <span>Institutional quant platform</span>
+          <span>Institutional quant platform v{platformVersion}</span>
         </div>
 
         <nav className="platform-menu" aria-label="Platform modules">
@@ -318,6 +322,30 @@ export function App() {
           >
             <LineChart size={17} />
             <span>Portfolio Risk</span>
+          </button>
+          <button
+            className={activeModule === "riskoptima-explorer" ? "module-link module-link--active" : "module-link"}
+            type="button"
+            onClick={() => setActiveModule("riskoptima-explorer")}
+          >
+            <BookOpen size={17} />
+            <span>RiskOptima Explorer</span>
+          </button>
+          <button
+            className={activeModule === "options-workbench" ? "module-link module-link--active" : "module-link"}
+            type="button"
+            onClick={() => setActiveModule("options-workbench")}
+          >
+            <FlaskConical size={17} />
+            <span>Options Workbench</span>
+          </button>
+          <button
+            className={activeModule === "backtest-studio" ? "module-link module-link--active" : "module-link"}
+            type="button"
+            onClick={() => setActiveModule("backtest-studio")}
+          >
+            <Activity size={17} />
+            <span>Backtest Studio</span>
           </button>
           <button
             className={activeModule === "economic-calendar" ? "module-link module-link--active" : "module-link"}
@@ -386,6 +414,19 @@ export function App() {
       <section className="workspace">
         {activeModule === "economic-calendar" ? (
           <EconomicCalendar />
+        ) : activeModule === "riskoptima-explorer" ? (
+          <RiskOptimaExplorer />
+        ) : activeModule === "options-workbench" ? (
+          <OptionsWorkbench portfolio={portfolioDetail} portfolioId={selectedId} startDate={startDate} asOfDate={asOfDate} />
+        ) : activeModule === "backtest-studio" ? (
+          <BacktestStudio
+            portfolio={portfolioDetail}
+            portfolioId={selectedId}
+            startDate={startDate}
+            asOfDate={asOfDate}
+            shortWindow={shortWindow}
+            longWindow={longWindow}
+          />
         ) : (
           <>
         <header className="topbar">

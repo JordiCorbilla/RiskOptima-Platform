@@ -108,6 +108,8 @@ export interface GeneratedRun {
   cache_hit: boolean;
   report: RiskReport;
   charts: RenderedChart[];
+  diagnostics?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface RunSummary {
@@ -123,6 +125,107 @@ export interface RunSummary {
     installed?: boolean;
     source?: string | null;
   };
+  diagnostics?: Record<string, unknown>;
+}
+
+export interface RunDiagnostics {
+  functions_executed: string[];
+  runtime_ms_by_stage: Record<string, number>;
+  fallback_used: boolean;
+  warnings: string[];
+  errors: string[];
+  generated_code: Record<string, string>;
+}
+
+export interface LibraryMetadata {
+  package_name: string;
+  installed_version: string | null;
+  import_source: string | null;
+  installed: boolean;
+  local_checkout_override_active: boolean;
+  python_version: string;
+  platform_engine_version: string;
+  platform_version: string;
+}
+
+export interface LibraryCapability {
+  module: string;
+  name: string;
+  category: string;
+  surfaced_in_platform: boolean;
+  demo_endpoint: string | null;
+  ui_module: string | null;
+  description: string;
+  example_code: string;
+}
+
+export type LibraryExample =
+  | "black_scholes_price"
+  | "greeks"
+  | "implied_volatility"
+  | "var_cvar"
+  | "volatility_estimator"
+  | "optimizer"
+  | "merton_pd";
+
+export interface ExampleRunResponse {
+  example: LibraryExample;
+  title: string;
+  inputs: Record<string, unknown>;
+  result: Record<string, unknown>;
+  generated_code: string;
+  diagnostics: RunDiagnostics;
+}
+
+export interface OptionsWorkbenchResponse {
+  portfolio_id: number;
+  underlying_symbol: string;
+  spot: number;
+  valuation_date: string;
+  expiries: string[];
+  strikes: number[];
+  option_chain: Array<Record<string, number | string | null>>;
+  aggregate_greeks: Record<string, number>;
+  iv_surface: Array<Record<string, number | string | null>>;
+  scenario_grid: Array<Record<string, number | string | null>>;
+  event_straddle_analysis: Array<Record<string, number | string | null>>;
+  generated_code: string;
+  diagnostics: RunDiagnostics;
+}
+
+export interface BacktestRunRequest {
+  start_date?: string;
+  as_of_date?: string;
+  strategy_type?: string;
+  short_window: number;
+  long_window: number;
+  rebalance_rule: string;
+  initial_cash?: number;
+  spread_bps: number;
+  slippage_bps: number;
+  stop_loss?: number;
+  take_profit?: number;
+}
+
+export interface BacktestRunResponse {
+  portfolio_id: number;
+  strategy_name: string;
+  parameters: Record<string, unknown>;
+  equity_curve: Array<{ date: string; value: number; cash: number; costs: number; turnover: number }>;
+  drawdown_curve: Array<{ date: string; drawdown: number }>;
+  trades: SignalTrade[];
+  turnover: number;
+  final_value: number;
+  total_return: number;
+  annualized_return: number;
+  annualized_volatility: number;
+  sharpe: number;
+  sortino: number;
+  max_drawdown: number;
+  win_rate: number;
+  comparisons: Array<Record<string, number | string>>;
+  generated_code: string;
+  diagnostics: RunDiagnostics;
 }
 
 export interface SignalPoint {

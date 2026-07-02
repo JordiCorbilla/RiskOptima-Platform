@@ -6,7 +6,9 @@
 
 Full-stack institutional portfolio risk platform powered by synthetic data and the published [RiskOptima](https://pypi.org/project/riskoptima/) Python package.
 
-The platform demonstrates a production-style quant workflow: editable portfolio books, deterministic synthetic market generation, dated portfolio risk runs, VaR/CVaR, drawdown, volatility, beta, factor exposure, marginal VaR, component VaR, RiskOptima efficient frontier analytics, SMA signal intelligence, notebook workbenches, per-instrument drilldowns, and stress testing.
+Platform version: `0.2.0`. RiskOptima package version: `2.5.2`.
+
+The platform demonstrates a production-style quant workflow: editable portfolio books, deterministic synthetic market generation, dated portfolio risk runs, VaR/CVaR, drawdown, volatility, beta, factor exposure, marginal VaR, component VaR, RiskOptima efficient frontier analytics, library capability exploration, options/Greeks/IV surfaces, SMA backtest studio, notebook workbenches, per-instrument drilldowns, and stress testing.
 
 ## Screenshots
 
@@ -14,9 +16,21 @@ RiskOptima branded navigation:
 
 ![RiskOptima branded sidebar](docs/screenshots/sidebar-brand.png)
 
-Portfolio risk overview with the current RiskOptima 2.4.1 engine:
+Portfolio risk overview with the current RiskOptima 2.5.2 engine:
 
 ![RiskOptima Platform desktop dashboard](docs/screenshots/dashboard-desktop.png)
+
+RiskOptima Library Explorer:
+
+![RiskOptima Library Explorer](docs/screenshots/riskoptima-explorer-252.png)
+
+Options Workbench:
+
+![RiskOptima Options Workbench](docs/screenshots/options-workbench-252.png)
+
+Backtest Studio:
+
+![RiskOptima Backtest Studio](docs/screenshots/backtest-studio-252.png)
 
 Risk dashboard in action:
 
@@ -83,7 +97,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
-The backend installs `riskoptima==2.4.1` from PyPI. For local RiskOptima library development only, set `RISKOPTIMA_PLATFORM_RISKOPTIMA_PATH` to a checkout path before starting FastAPI.
+The backend installs `riskoptima==2.5.2` from PyPI. For local RiskOptima library development only, set `RISKOPTIMA_PLATFORM_RISKOPTIMA_PATH` to a checkout path before starting FastAPI.
 
 Frontend:
 
@@ -93,13 +107,13 @@ npm install
 npm run dev
 ```
 
-The Economic Calendar is available from the main dashboard module menu. Run the .NET calendar backend on `http://127.0.0.1:5176`; the main Vite app proxies `/calendar-api` to it.
+The main dashboard module menu includes Portfolio Risk, RiskOptima Explorer, Options Workbench, Backtest Studio, and Economic Calendar. Run the .NET calendar backend on `http://127.0.0.1:5176`; the main Vite app proxies `/calendar-api` to it.
 
 Open `http://localhost:5173` and either load a built-in sample portfolio from the sidebar or upload one of the CSV files in `sample_data`, such as `institutional_portfolio.csv` or `vanguard_multi_asset_portfolio.csv`. The UI lets you edit positions, save the portfolio definition, choose a start date and as-of date, generate a cached run, or force a recalculation.
 
 The dashboard includes section tabs, portfolio validation, run-progress feedback, cached run history, and clickable instrument drilldowns for signal, VaR contribution, and stress-impact inspection.
 
-The Workbench tab also surfaces RiskOptima 2.4.1 additions: Markov market-regime probabilities, portfolio sophistication method comparisons, and the volatility toolkit.
+The Workbench tab also surfaces RiskOptima additions: Markov market-regime probabilities, portfolio sophistication method comparisons, and the volatility toolkit.
 
 ## Storage and Run Dates
 
@@ -129,12 +143,17 @@ The API runs on `http://localhost:8000`; the containerized frontend is exposed o
 - `GET /api/portfolios`
 - `GET /api/portfolio-samples`
 - `POST /api/portfolio-samples/{slug}/load`
+- `GET /api/library/metadata`
+- `GET /api/library/capabilities`
+- `POST /api/library/run-example`
 - `GET /api/portfolios/{id}`
 - `PUT /api/portfolios/{id}`
 - `GET /api/portfolios/{id}/risk`
 - `POST /api/portfolios/{id}/generate`
 - `GET /api/portfolios/{id}/signals`
 - `GET /api/portfolios/{id}/notebooks`
+- `GET /api/portfolios/{id}/options-workbench`
+- `POST /api/portfolios/{id}/backtests/run`
 - `GET /api/portfolios/{id}/stress`
 - `GET /api/scenarios`
 - `POST /api/scenarios/run`
@@ -171,6 +190,12 @@ The signal workbench calls RiskOptima's SMA helpers and backtest engine:
 - `run_backtest`
 
 Each generated portfolio run can be paired with a dated signal report so users can click a holding and inspect close price, SMA bands, buy/sell crossovers, trade history, win rate, drawdown, and strategy equity path.
+
+The RiskOptima Explorer exposes package metadata, import source, local checkout status, platform version, a searchable capability map, and deterministic runnable examples with generated Python snippets.
+
+The Options Workbench calls RiskOptima 2.5.2 option-chain, implied-volatility surface, Greeks grid, scenario-grid, and event-straddle APIs against deterministic synthetic holdings.
+
+The Backtest Studio calls `SMACrossStrategy`, `run_backtest`, `BacktestConfig`, `SimpleCostModel`, and SMA trade extraction, then compares the SMA result against static and optimized max-Sharpe allocation baselines.
 
 ## Notebook Coverage
 

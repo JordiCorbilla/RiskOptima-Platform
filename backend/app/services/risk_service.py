@@ -10,6 +10,7 @@ from scipy.stats import norm
 from sklearn.linear_model import LinearRegression
 
 from app.core.config import get_settings
+from app.core.version import PLATFORM_ENGINE_VERSION, PLATFORM_VERSION
 from app.domain.models import ChartPoint, Portfolio, RiskMetric, RiskReport
 from app.services.market_data_service import generate_synthetic_market_data
 from app.services.stress_service import DEFAULT_SCENARIOS, run_stress_scenario
@@ -28,18 +29,25 @@ def _ensure_riskoptima_path() -> None:
 
 
 def riskoptima_engine_metadata() -> dict[str, str | bool | None]:
+    _ensure_riskoptima_path()
     spec = find_spec("riskoptima")
     package_version = None
     try:
         package_version = version("riskoptima")
     except PackageNotFoundError:
         package_version = None
+    configured = get_settings().riskoptima_path
+    source = spec.origin if spec and spec.origin else None
+    local_override = bool(configured and source and str(configured.resolve()).lower() in str(Path(source).resolve()).lower())
     return {
         "name": "RiskOptima",
         "package": "riskoptima",
         "version": package_version,
         "installed": spec is not None,
-        "source": spec.origin if spec and spec.origin else None,
+        "source": source,
+        "local_checkout_override_active": local_override,
+        "platform_version": PLATFORM_VERSION,
+        "platform_engine_version": PLATFORM_ENGINE_VERSION,
     }
 
 

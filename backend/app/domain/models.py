@@ -147,6 +147,8 @@ class GeneratedRun(BaseModel):
     cache_hit: bool
     report: RiskReport
     charts: list[dict[str, str]]
+    diagnostics: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class RunSummary(BaseModel):
@@ -156,3 +158,99 @@ class RunSummary(BaseModel):
     as_of_date: date
     generated_at: datetime
     analytics_engine: dict[str, Any] = Field(default_factory=dict)
+    diagnostics: dict[str, Any] = Field(default_factory=dict)
+
+
+class RunDiagnostics(BaseModel):
+    functions_executed: list[str] = Field(default_factory=list)
+    runtime_ms_by_stage: dict[str, float] = Field(default_factory=dict)
+    fallback_used: bool = False
+    warnings: list[str] = Field(default_factory=list)
+    errors: list[str] = Field(default_factory=list)
+    generated_code: dict[str, str] = Field(default_factory=dict)
+
+
+class LibraryMetadata(BaseModel):
+    package_name: str
+    installed_version: str | None = None
+    import_source: str | None = None
+    installed: bool
+    local_checkout_override_active: bool
+    python_version: str
+    platform_engine_version: str
+    platform_version: str
+
+
+class LibraryCapability(BaseModel):
+    module: str
+    name: str
+    category: str
+    surfaced_in_platform: bool
+    demo_endpoint: str | None = None
+    ui_module: str | None = None
+    description: str
+    example_code: str
+
+
+class ExampleRunRequest(BaseModel):
+    example: str = Field(pattern="^(black_scholes_price|greeks|implied_volatility|var_cvar|volatility_estimator|optimizer|merton_pd)$")
+
+
+class ExampleRunResponse(BaseModel):
+    example: str
+    title: str
+    inputs: dict[str, Any]
+    result: dict[str, Any]
+    generated_code: str
+    diagnostics: RunDiagnostics
+
+
+class OptionsWorkbenchResponse(BaseModel):
+    portfolio_id: int
+    underlying_symbol: str
+    spot: float
+    valuation_date: date
+    expiries: list[str]
+    strikes: list[float]
+    option_chain: list[dict[str, Any]]
+    aggregate_greeks: dict[str, float]
+    iv_surface: list[dict[str, Any]]
+    scenario_grid: list[dict[str, Any]]
+    event_straddle_analysis: list[dict[str, Any]]
+    generated_code: str
+    diagnostics: RunDiagnostics
+
+
+class BacktestRunRequest(BaseModel):
+    start_date: date | None = None
+    as_of_date: date | None = None
+    strategy_type: str = "sma_crossover"
+    short_window: int = Field(default=20, ge=2, le=120)
+    long_window: int = Field(default=50, ge=3, le=260)
+    rebalance_rule: str = "D"
+    initial_cash: float | None = None
+    spread_bps: float = Field(default=2.0, ge=0.0, le=100.0)
+    slippage_bps: float = Field(default=0.0, ge=0.0, le=100.0)
+    stop_loss: float | None = Field(default=0.05, ge=0.0, le=1.0)
+    take_profit: float | None = Field(default=0.10, ge=0.0, le=2.0)
+
+
+class BacktestRunResponse(BaseModel):
+    portfolio_id: int
+    strategy_name: str
+    parameters: dict[str, Any]
+    equity_curve: list[dict[str, Any]]
+    drawdown_curve: list[dict[str, Any]]
+    trades: list[dict[str, Any]]
+    turnover: float
+    final_value: float
+    total_return: float
+    annualized_return: float
+    annualized_volatility: float
+    sharpe: float
+    sortino: float
+    max_drawdown: float
+    win_rate: float
+    comparisons: list[dict[str, Any]]
+    generated_code: str
+    diagnostics: RunDiagnostics

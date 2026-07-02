@@ -67,7 +67,7 @@ export function NotebookWorkbench({ workbench }: { workbench: NotebookWorkbenchP
         <div className="panel chart-panel chart-panel--wide">
           <div className="panel-heading">
             <h2>Portfolio Sophistication Methods</h2>
-            <span>RiskOptima 2.4.1</span>
+            <span>RiskOptima 2.5.2</span>
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={workbench.portfolio_sophistication.performance}>

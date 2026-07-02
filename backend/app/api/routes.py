@@ -4,8 +4,15 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Upload
 
 from app.db.session import get_portfolio_repository
 from app.domain.models import (
+    BacktestRunRequest,
+    BacktestRunResponse,
+    ExampleRunRequest,
+    ExampleRunResponse,
     GenerateRunRequest,
     GeneratedRun,
+    LibraryCapability,
+    LibraryMetadata,
+    OptionsWorkbenchResponse,
     Portfolio,
     SamplePortfolioSummary,
     PortfolioSummary,
@@ -17,9 +24,12 @@ from app.domain.models import (
     StressScenario,
 )
 from app.repositories.portfolio_repository import PortfolioRepository
+from app.services.backtest_service import run_backtest_studio
 from app.services.portfolio_service import parse_portfolio_csv
 from app.services.generation_service import generate_portfolio_run, list_portfolio_runs
+from app.services.library_service import get_library_metadata, list_library_capabilities, run_library_example
 from app.services.notebook_service import build_notebook_workbench
+from app.services.options_service import build_options_workbench
 from app.services.render_service import build_rendered_charts
 from app.services.risk_service import build_portfolio_risk_report
 from app.services.sample_portfolio_service import get_sample_portfolio, list_sample_portfolios
@@ -27,6 +37,24 @@ from app.services.signal_service import build_signal_report
 from app.services.stress_service import get_scenario, list_scenarios, run_stress_scenario
 
 router = APIRouter()
+
+
+@router.get("/library/metadata", response_model=LibraryMetadata)
+def get_riskoptima_library_metadata() -> LibraryMetadata:
+    return get_library_metadata()
+
+
+@router.get("/library/capabilities", response_model=list[LibraryCapability])
+def get_riskoptima_library_capabilities() -> list[LibraryCapability]:
+    return list_library_capabilities()
+
+
+@router.post("/library/run-example", response_model=ExampleRunResponse)
+def run_riskoptima_library_example(request: ExampleRunRequest) -> ExampleRunResponse:
+    try:
+        return run_library_example(request)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @router.post("/portfolios/upload", response_model=Portfolio, status_code=201)
@@ -187,6 +215,38 @@ def get_portfolio_notebook_workbench(
         raise HTTPException(status_code=404, detail="Portfolio not found")
     try:
         return build_notebook_workbench(portfolio, start_date=start_date, as_of_date=as_of_date)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.get("/portfolios/{portfolio_id}/options-workbench", response_model=OptionsWorkbenchResponse)
+def get_options_workbench(
+    portfolio_id: int,
+    symbol: str | None = None,
+    start_date: date | None = None,
+    as_of_date: date | None = None,
+    repository: PortfolioRepository = Depends(get_portfolio_repository),
+) -> OptionsWorkbenchResponse:
+    portfolio = repository.get(portfolio_id)
+    if portfolio is None:
+        raise HTTPException(status_code=404, detail="Portfolio not found")
+    try:
+        return build_options_workbench(portfolio, symbol=symbol, start_date=start_date, as_of_date=as_of_date)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/portfolios/{portfolio_id}/backtests/run", response_model=BacktestRunResponse)
+def run_portfolio_backtest(
+    portfolio_id: int,
+    request: BacktestRunRequest,
+    repository: PortfolioRepository = Depends(get_portfolio_repository),
+) -> BacktestRunResponse:
+    portfolio = repository.get(portfolio_id)
+    if portfolio is None:
+        raise HTTPException(status_code=404, detail="Portfolio not found")
+    try:
+        return run_backtest_studio(portfolio, request)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

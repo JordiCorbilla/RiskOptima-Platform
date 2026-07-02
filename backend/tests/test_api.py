@@ -43,6 +43,31 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     samples = samples_response.json()
     assert any(sample["slug"] == "vanguard_multi_asset_portfolio" for sample in samples)
 
+    metadata_response = client.get(f"{get_settings().api_prefix}/library/metadata")
+    assert metadata_response.status_code == 200
+    metadata = metadata_response.json()
+    assert metadata["package_name"] == "riskoptima"
+    assert metadata["platform_version"]
+
+    capabilities_response = client.get(f"{get_settings().api_prefix}/library/capabilities")
+    assert capabilities_response.status_code == 200
+    capabilities = capabilities_response.json()
+    assert any(item["category"] == "options" and item["surfaced_in_platform"] for item in capabilities)
+
+    example_response = client.post(
+        f"{get_settings().api_prefix}/library/run-example",
+        json={"example": "black_scholes_price"},
+    )
+    assert example_response.status_code == 200
+    assert example_response.json()["result"]["price"] > 0
+
+    repeated_example_response = client.post(
+        f"{get_settings().api_prefix}/library/run-example",
+        json={"example": "black_scholes_price"},
+    )
+    assert repeated_example_response.status_code == 200
+    assert repeated_example_response.json()["result"] == example_response.json()["result"]
+
     sample_load_response = client.post(f"{get_settings().api_prefix}/portfolio-samples/vanguard_multi_asset_portfolio/load")
     assert sample_load_response.status_code == 201
     assert sample_load_response.json()["name"] == "Vanguard Multi-Asset Model"
@@ -145,6 +170,37 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     assert notebooks["portfolio_sophistication"]["weights"]
     assert notebooks["volatility_toolkit"]["series"]
     assert notebooks["volatility_toolkit"]["assets"]
+
+    options_response = client.get(
+        f"{get_settings().api_prefix}/portfolios/{portfolio_id}/options-workbench",
+        params={"symbol": "AAA", "start_date": "2024-06-26", "as_of_date": "2026-06-28"},
+    )
+    assert options_response.status_code == 200
+    options = options_response.json()
+    assert options["underlying_symbol"] == "AAA"
+    assert options["option_chain"]
+    assert options["iv_surface"]
+    assert options["scenario_grid"]
+    assert options["generated_code"]
+
+    backtest_response = client.post(
+        f"{get_settings().api_prefix}/portfolios/{portfolio_id}/backtests/run",
+        json={
+            "start_date": "2024-06-26",
+            "as_of_date": "2026-06-28",
+            "short_window": 10,
+            "long_window": 30,
+            "rebalance_rule": "D",
+            "spread_bps": 2,
+            "slippage_bps": 0,
+        },
+    )
+    assert backtest_response.status_code == 200
+    backtest = backtest_response.json()
+    assert backtest["equity_curve"]
+    assert backtest["drawdown_curve"]
+    assert len(backtest["comparisons"]) >= 3
+    assert "riskoptima.backtest.run_backtest" in backtest["diagnostics"]["functions_executed"]
 
     scenarios_response = client.get(f"{get_settings().api_prefix}/scenarios")
     assert scenarios_response.status_code == 200

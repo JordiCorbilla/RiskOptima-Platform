@@ -1,6 +1,13 @@
 import type {
+  BacktestRunRequest,
+  BacktestRunResponse,
+  ExampleRunResponse,
   GeneratedRun,
+  LibraryCapability,
+  LibraryExample,
+  LibraryMetadata,
   NotebookWorkbench,
+  OptionsWorkbenchResponse,
   Portfolio,
   PortfolioSignalReport,
   PortfolioSummary,
@@ -37,6 +44,22 @@ export function loadSamplePortfolio(slug: string): Promise<Portfolio> {
 
 export function getPortfolio(portfolioId: number): Promise<Portfolio> {
   return request<Portfolio>(`/portfolios/${portfolioId}`);
+}
+
+export function getLibraryMetadata(): Promise<LibraryMetadata> {
+  return request<LibraryMetadata>("/library/metadata");
+}
+
+export function getLibraryCapabilities(): Promise<LibraryCapability[]> {
+  return request<LibraryCapability[]>("/library/capabilities");
+}
+
+export function runLibraryExample(example: LibraryExample): Promise<ExampleRunResponse> {
+  return request<ExampleRunResponse>("/library/run-example", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ example })
+  });
 }
 
 export function updatePortfolio(portfolio: Portfolio): Promise<Portfolio> {
@@ -113,4 +136,23 @@ export function getNotebookWorkbench(
     if (value) query.set(key, value);
   });
   return request<NotebookWorkbench>(`/portfolios/${portfolioId}/notebooks?${query.toString()}`);
+}
+
+export function getOptionsWorkbench(
+  portfolioId: number,
+  params: { symbol?: string; start_date?: string; as_of_date?: string }
+): Promise<OptionsWorkbenchResponse> {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value) query.set(key, value);
+  });
+  return request<OptionsWorkbenchResponse>(`/portfolios/${portfolioId}/options-workbench?${query.toString()}`);
+}
+
+export function runBacktest(portfolioId: number, payload: BacktestRunRequest): Promise<BacktestRunResponse> {
+  return request<BacktestRunResponse>(`/portfolios/${portfolioId}/backtests/run`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
 }

@@ -1,12 +1,12 @@
 # Architecture
 
-RiskOptima Platform is split into four explicit layers:
+RiskOptima Platform `0.2.0` is split into explicit layers:
 
 1. React + TypeScript dashboard for upload, portfolio editing, dated runs, charts, and risk tables.
 2. FastAPI REST API for portfolio ingestion, reports, and scenarios.
 3. Domain and repository layer that persists portfolios to SQLite behind an interface.
 4. Generated-run cache that stores report/chart JSON by deterministic portfolio/date hash.
-5. Analytics layer that uses synthetic market data and the published RiskOptima package's market-risk, factor, optimization, and signal/backtest APIs.
+5. Analytics layer that uses synthetic market data and the published `riskoptima==2.5.2` package's market-risk, factor, optimization, options, volatility, credit, regime, and signal/backtest APIs.
 
 ```mermaid
 flowchart LR
@@ -17,7 +17,13 @@ flowchart LR
   Runs --> Cache["backend/generated_data"]
   Runs --> Analytics["Risk service"]
   API --> Signals["Signal service"]
+  API --> Library["Library explorer service"]
+  API --> Options["Options service"]
+  API --> Backtests["Backtest service"]
   Signals --> RiskOptima
+  Library --> RiskOptima
+  Options --> RiskOptima
+  Backtests --> RiskOptima
   Analytics --> RiskOptima["RiskOptima package"]
   Analytics --> Synthetic["Synthetic market data"]
   Signals --> Synthetic
@@ -37,6 +43,9 @@ The repository interface is deliberately small: save, list, get, and update port
 8. RiskOptima calculates dashboard-ready market risk metrics and efficient frontier output.
 9. The platform enriches the report with marginal VaR, component VaR, factor exposures, stress results, chart-ready time series, and notebook-style rendered RiskOptima charts.
 10. The signal service reuses the same dated synthetic prices to run RiskOptima SMA signal frames and the backtest engine for instrument drilldowns.
+11. The Library Explorer exposes package metadata, capability coverage, deterministic examples, diagnostics, and generated Python snippets.
+12. The Options Workbench calls RiskOptima 2.5.2 option-chain, Greeks-grid, IV-surface, scenario-grid, and event-straddle APIs.
+13. The Backtest Studio calls RiskOptima strategy/backtest APIs and compares static, SMA, and optimized allocation baselines.
 
 ## Synthetic Data
 
@@ -52,7 +61,7 @@ Generated artifacts are kept outside SQLite because rendered chart payloads are 
 
 The cache key includes the complete portfolio payload, the resolved start date, the resolved as-of date, the platform engine version, and the installed RiskOptima package version. Editing a position or upgrading RiskOptima naturally creates a new run id, while **Force recalc** overwrites an existing run folder for the same key.
 
-Every risk report also carries an `analytics_engine` object containing the RiskOptima package name, installed version, and import source. This gives the UI and generated JSON artifacts an audit trail for which library release produced the analytics.
+Every risk report also carries an `analytics_engine` object containing the RiskOptima package name, installed version, import source, local checkout status, platform version, and platform engine version. Generated runs include diagnostics for functions executed, generated code snippets, fallback status, warnings, errors, and stage timings.
 
 ## Notebook Onboarding Map
 
@@ -66,4 +75,4 @@ Additional notebook surfaces are exposed as a separate workbench rather than ove
 - fixed-income duration/convexity analytics
 - stochastic volatility scenario models
 
-The notebooks that rely on live Yahoo data are represented through deterministic synthetic data and structured payloads. That keeps the flagship demo reproducible while preserving the analytical intent of the library examples. Production and Docker installs use `riskoptima==2.4.1` from PyPI; local checkout overrides are reserved for library development.
+The notebooks that rely on live Yahoo data are represented through deterministic synthetic data and structured payloads. That keeps the flagship demo reproducible while preserving the analytical intent of the library examples. Production and Docker installs use `riskoptima==2.5.2` from PyPI; local checkout overrides are reserved for library development.
