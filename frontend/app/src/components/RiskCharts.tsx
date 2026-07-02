@@ -77,7 +77,13 @@ export function RiskCharts({ report }: { report: RiskReport }) {
           </BarChart>
         </ResponsiveContainer>
       </div>
+    </section>
+  );
+}
 
+export function OptimizationCharts({ report }: { report: RiskReport }) {
+  return (
+    <section className="chart-grid" aria-label="Portfolio optimization charts">
       <div className="panel chart-panel chart-panel--wide">
         <div className="panel-heading">
           <h2>Efficient Frontier</h2>

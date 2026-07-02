@@ -6,7 +6,7 @@ import { ContributorsTable, CorrelationMatrixTable, PortfolioDetailsTable, Stres
 import { MetricCard } from "./components/MetricCard";
 import { NotebookWorkbench } from "./components/NotebookWorkbench";
 import { RenderedChartGallery } from "./components/RenderedChartGallery";
-import { RiskCharts } from "./components/RiskCharts";
+import { OptimizationCharts, RiskCharts } from "./components/RiskCharts";
 import { SignalWorkbench } from "./components/SignalWorkbench";
 import {
   generatePortfolioRun,
@@ -660,7 +660,7 @@ export function App() {
               </>
             ) : null}
 
-            {activeSection === "Optimization" ? <RiskCharts report={report} /> : null}
+            {activeSection === "Optimization" ? <OptimizationCharts report={report} /> : null}
 
             {activeSection === "Signals" && signalReport ? (
               <SignalWorkbench
