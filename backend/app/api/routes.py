@@ -15,6 +15,7 @@ from app.domain.models import (
     LibraryMetadata,
     OptionsWorkbenchResponse,
     Portfolio,
+    RatesWorkbenchResponse,
     SamplePortfolioSummary,
     PortfolioSummary,
     PortfolioUpdateRequest,
@@ -31,6 +32,7 @@ from app.services.generation_service import generate_portfolio_run, list_portfol
 from app.services.library_service import get_library_metadata, list_library_capabilities, run_library_example
 from app.services.notebook_service import build_notebook_workbench
 from app.services.options_service import build_options_workbench
+from app.services.rates_service import build_rates_workbench
 from app.services.render_service import build_rendered_charts
 from app.services.risk_service import build_portfolio_risk_report
 from app.services.sample_portfolio_service import get_sample_portfolio, list_sample_portfolios
@@ -64,6 +66,14 @@ def get_riskoptima_library_capabilities() -> list[LibraryCapability]:
 def run_riskoptima_library_example(request: ExampleRunRequest) -> ExampleRunResponse:
     try:
         return run_library_example(request)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.get("/rates/sofr-curve", response_model=RatesWorkbenchResponse)
+def get_rates_sofr_curve(valuation_date: date | None = None) -> RatesWorkbenchResponse:
+    try:
+        return build_rates_workbench(valuation_date=valuation_date)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

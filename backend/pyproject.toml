@@ -1,6 +1,6 @@
 [project]
 name = "riskoptima-platform-backend"
-version = "0.2.0"
+version = "0.3.0"
 description = "FastAPI backend for the RiskOptima institutional portfolio risk platform."
 requires-python = ">=3.11"
 dependencies = [
@@ -17,7 +17,7 @@ dependencies = [
     "matplotlib>=3.8.4",
     "seaborn>=0.13.2",
     "squarify>=0.4.4",
-    "riskoptima==2.5.2",
+    "riskoptima==2.7.0",
 ]
 
 [project.optional-dependencies]

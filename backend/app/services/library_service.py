@@ -51,6 +51,10 @@ def list_library_capabilities() -> list[LibraryCapability]:
         ("riskoptima.backtest", "SMACrossStrategy", "backtesting", True, "/api/portfolios/{id}/backtests/run", "Backtest Studio", "SMA crossover strategy model used by portfolio-level backtests."),
         ("riskoptima.backtest", "run_backtest", "backtesting", True, "/api/portfolios/{id}/backtests/run", "Backtest Studio", "Deterministic synthetic backtest engine for strategy equity, turnover, and costs."),
         ("riskoptima.backtest", "trades_from_sma_signals", "backtesting", True, "/api/portfolios/{id}/backtests/run", "Backtest Studio", "Trade extraction from SMA crossover signals with stop-loss/take-profit exits."),
+        ("riskoptima.rates", "bootstrap_sofr_curve", "rates", True, "/api/rates/sofr-curve", "Rates Workbench", "Institutional dated SOFR curve bootstrapping from deposits, FOMC intervals, futures, and OIS swaps."),
+        ("riskoptima.rates", "reprice_sofr_instruments", "rates", True, "/api/rates/sofr-curve", "Rates Workbench", "Calibration diagnostics for mixed money-market, futures, and OIS instruments."),
+        ("riskoptima.rates", "curve_calibration_jacobian", "rates", True, "/api/rates/sofr-curve", "Rates Workbench", "Quote-to-curve-node sensitivity matrix for calibration transparency."),
+        ("riskoptima.rates", "key_rate_dv01", "rates", True, "/api/rates/sofr-curve", "Rates Workbench", "Key-rate DV01 attribution for fixed-income exposure against the calibrated curve."),
         ("riskoptima.credit", "expected_loss / credit_var / credit_cvar / merton_pd", "credit", True, "/api/portfolios/{id}/notebooks", "RiskOptima Explorer", "Synthetic credit expected loss, VaR/CVaR, migration, and Merton PD views."),
         ("riskoptima.RiskOptima", "macaulay_duration_v3", "fixed income", True, "/api/portfolios/{id}/notebooks", "RiskOptima Explorer", "Duration, modified duration, PVBP, and convexity measures."),
         ("riskoptima.reporting", "build_markov_regime_report", "regimes", True, "/api/portfolios/{id}/notebooks", "RiskOptima Explorer", "Markov regime probabilities, summaries, and transition matrix."),
@@ -126,7 +130,7 @@ def run_library_example(request: ExampleRunRequest) -> ExampleRunResponse:
         diagnostics.functions_executed.extend(["riskoptima.RiskOptima.cvar_historic"])
         if not hasattr(RiskOptima, "var_historic"):
             diagnostics.fallback_used = True
-            diagnostics.warnings.append("RiskOptima exposes cvar_historic in 2.5.2; VaR percentile used platform fallback.")
+            diagnostics.warnings.append("RiskOptima exposes cvar_historic; VaR percentile used platform fallback.")
         title = "VaR / CVaR"
     elif example == "volatility_estimator":
         from riskoptima.volatility import ewma_volatility, historical_volatility, rolling_volatility
@@ -159,7 +163,7 @@ def run_library_example(request: ExampleRunRequest) -> ExampleRunResponse:
         code = "from riskoptima.optim import Constraints, optimize_max_sharpe\nweights = optimize_max_sharpe(expected_returns, covariance, constraints=Constraints(weight_bounds=(0.05, 0.60)), risk_free_rate=0.04)"
         diagnostics.functions_executed.extend(["riskoptima.optim.optimize_max_sharpe", "riskoptima.optim.optimize_min_variance"])
         title = "Optimizer"
-    else:
+    elif example == "merton_pd":
         from riskoptima.credit import merton_pd
 
         inputs = {"asset_value": 135.0, "debt_face_value": 100.0, "asset_vol": 0.28, "risk_free_rate": 0.04, "maturity": 1.0}
@@ -167,5 +171,23 @@ def run_library_example(request: ExampleRunRequest) -> ExampleRunResponse:
         code = "from riskoptima.credit import merton_pd\npd = merton_pd(asset_value=135, debt_face_value=100, asset_vol=0.28, risk_free_rate=0.04, maturity=1.0)"
         diagnostics.functions_executed.append("riskoptima.credit.merton_pd")
         title = "Merton PD"
+    elif example == "sofr_curve":
+        from app.services.rates_service import build_rates_workbench
+
+        workbench = build_rates_workbench()
+        inputs = {"valuation_date": workbench.valuation_date.isoformat(), "quotes": len(workbench.quotes)}
+        result = {
+            "curve_name": workbench.curve_name,
+            "five_year_zero_rate": workbench.summary["five_year_zero_rate"],
+            "five_year_par_swap_rate": workbench.summary["five_year_par_swap_rate"],
+            "fixed_rate_bond_price": workbench.summary["fixed_rate_bond_price"],
+            "total_key_rate_dv01": workbench.summary["total_key_rate_dv01"],
+            "max_calibration_error_bps": workbench.summary["max_calibration_error_bps"],
+        }
+        code = workbench.generated_code
+        diagnostics = workbench.diagnostics
+        title = "SOFR Curve Workbench"
+    else:
+        raise ValueError(f"Unsupported example: {example}")
 
     return ExampleRunResponse(example=example, title=title, inputs=inputs, result=result, generated_code=code, diagnostics=diagnostics)

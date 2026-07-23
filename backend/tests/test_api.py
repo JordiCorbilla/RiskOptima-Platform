@@ -60,6 +60,7 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     assert capabilities_response.status_code == 200
     capabilities = capabilities_response.json()
     assert any(item["category"] == "options" and item["surfaced_in_platform"] for item in capabilities)
+    assert any(item["category"] == "rates" and item["ui_module"] == "Rates Workbench" for item in capabilities)
 
     example_response = client.post(
         f"{get_settings().api_prefix}/library/run-example",
@@ -74,6 +75,23 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     )
     assert repeated_example_response.status_code == 200
     assert repeated_example_response.json()["result"] == example_response.json()["result"]
+
+    rates_response = client.get(f"{get_settings().api_prefix}/rates/sofr-curve")
+    assert rates_response.status_code == 200
+    rates = rates_response.json()
+    assert rates["library_version"] == "2.7.0"
+    assert rates["curve_points"]
+    assert rates["calibration"]
+    assert rates["key_rate_dv01"]
+    assert rates["jacobian"]
+    assert "riskoptima.rates.bootstrap_sofr_curve" in rates["diagnostics"]["functions_executed"]
+
+    rates_example_response = client.post(
+        f"{get_settings().api_prefix}/library/run-example",
+        json={"example": "sofr_curve"},
+    )
+    assert rates_example_response.status_code == 200
+    assert rates_example_response.json()["result"]["five_year_par_swap_rate"] == rates["summary"]["five_year_par_swap_rate"]
 
     sample_load_response = client.post(f"{get_settings().api_prefix}/portfolio-samples/vanguard_multi_asset_portfolio/load")
     assert sample_load_response.status_code == 201

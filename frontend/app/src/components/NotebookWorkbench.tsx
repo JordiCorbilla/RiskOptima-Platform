@@ -81,7 +81,7 @@ export function NotebookWorkbench({ workbench }: { workbench: NotebookWorkbenchP
           <div className="panel-heading">
             <div>
               <h2>Portfolio Sophistication Methods</h2>
-              <span>RiskOptima 2.5.2</span>
+              <span>RiskOptima 2.7.0</span>
             </div>
             <ChartDownloadButton filename="riskoptima-portfolio-sophistication-methods" />
           </div>

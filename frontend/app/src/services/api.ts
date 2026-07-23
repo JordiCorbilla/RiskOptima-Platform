@@ -11,6 +11,7 @@ import type {
   Portfolio,
   PortfolioSignalReport,
   PortfolioSummary,
+  RatesWorkbenchResponse,
   RenderedChart,
   RiskReport,
   RunSummary,
@@ -60,6 +61,13 @@ export function runLibraryExample(example: LibraryExample): Promise<ExampleRunRe
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ example })
   });
+}
+
+export function getRatesWorkbench(params: { valuation_date?: string } = {}): Promise<RatesWorkbenchResponse> {
+  const query = new URLSearchParams();
+  if (params.valuation_date) query.set("valuation_date", params.valuation_date);
+  const suffix = query.toString() ? `?${query.toString()}` : "";
+  return request<RatesWorkbenchResponse>(`/rates/sofr-curve${suffix}`);
 }
 
 export function updatePortfolio(portfolio: Portfolio): Promise<Portfolio> {

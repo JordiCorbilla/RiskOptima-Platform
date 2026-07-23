@@ -1,6 +1,6 @@
 # Options Workbench
 
-The Options Workbench uses deterministic synthetic price paths for a selected portfolio holding and calls RiskOptima 2.5.2 option analytics directly.
+The Options Workbench uses deterministic synthetic price paths for a selected portfolio holding and calls RiskOptima 2.7.0 option analytics directly.
 
 Current RiskOptima APIs used:
 

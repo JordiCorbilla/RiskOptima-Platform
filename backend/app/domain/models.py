@@ -193,7 +193,9 @@ class LibraryCapability(BaseModel):
 
 
 class ExampleRunRequest(BaseModel):
-    example: str = Field(pattern="^(black_scholes_price|greeks|implied_volatility|var_cvar|volatility_estimator|optimizer|merton_pd)$")
+    example: str = Field(
+        pattern="^(black_scholes_price|greeks|implied_volatility|var_cvar|volatility_estimator|optimizer|merton_pd|sofr_curve)$"
+    )
 
 
 class ExampleRunResponse(BaseModel):
@@ -201,6 +203,64 @@ class ExampleRunResponse(BaseModel):
     title: str
     inputs: dict[str, Any]
     result: dict[str, Any]
+    generated_code: str
+    diagnostics: RunDiagnostics
+
+
+class RatesQuote(BaseModel):
+    quote_id: str
+    instrument_type: str
+    start_date: str | None = None
+    end_date: str | None = None
+    maturity_date: str | None = None
+    rate: float | None = None
+    price: float | None = None
+    convexity_adjustment_bps: float | None = None
+    payment_frequency: int | None = None
+
+
+class RatesCurvePoint(BaseModel):
+    tenor: float
+    tenor_label: str
+    zero_rate: float
+    forward_rate: float
+    discount_factor: float
+    par_swap_rate: float
+
+
+class RatesCalibrationRow(BaseModel):
+    quote_id: str
+    instrument_type: str
+    start_date: str
+    end_date: str
+    market_rate: float
+    model_rate: float
+    error_bps: float
+
+
+class RatesKeyRateDv01(BaseModel):
+    key_tenor: float
+    tenor_label: str
+    dv01: float
+    contribution_percent: float
+
+
+class RatesJacobianRow(BaseModel):
+    output_tenor: float
+    output_tenor_label: str
+    sensitivities: dict[str, float]
+
+
+class RatesWorkbenchResponse(BaseModel):
+    valuation_date: date
+    curve_name: str
+    library_version: str | None = None
+    summary: dict[str, Any]
+    quotes: list[RatesQuote]
+    curve_points: list[RatesCurvePoint]
+    calibration: list[RatesCalibrationRow]
+    key_rate_dv01: list[RatesKeyRateDv01]
+    jacobian: list[RatesJacobianRow]
     generated_code: str
     diagnostics: RunDiagnostics
 

@@ -9,6 +9,7 @@ vi.mock("./services/api", () => ({
   getLibraryMetadata: vi.fn(),
   getLibraryCapabilities: vi.fn(),
   runLibraryExample: vi.fn(),
+  getRatesWorkbench: vi.fn(),
   getOptionsWorkbench: vi.fn(),
   runBacktest: vi.fn(),
   getPortfolio: vi.fn(),

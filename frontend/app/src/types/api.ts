@@ -166,13 +166,80 @@ export type LibraryExample =
   | "var_cvar"
   | "volatility_estimator"
   | "optimizer"
-  | "merton_pd";
+  | "merton_pd"
+  | "sofr_curve";
 
 export interface ExampleRunResponse {
   example: LibraryExample;
   title: string;
   inputs: Record<string, unknown>;
   result: Record<string, unknown>;
+  generated_code: string;
+  diagnostics: RunDiagnostics;
+}
+
+export interface RatesQuote {
+  quote_id: string;
+  instrument_type: string;
+  start_date: string | null;
+  end_date: string | null;
+  maturity_date: string | null;
+  rate: number | null;
+  price: number | null;
+  convexity_adjustment_bps: number | null;
+  payment_frequency: number | null;
+}
+
+export interface RatesCurvePoint {
+  tenor: number;
+  tenor_label: string;
+  zero_rate: number;
+  forward_rate: number;
+  discount_factor: number;
+  par_swap_rate: number;
+}
+
+export interface RatesCalibrationRow {
+  quote_id: string;
+  instrument_type: string;
+  start_date: string;
+  end_date: string;
+  market_rate: number;
+  model_rate: number;
+  error_bps: number;
+}
+
+export interface RatesKeyRateDv01 {
+  key_tenor: number;
+  tenor_label: string;
+  dv01: number;
+  contribution_percent: number;
+}
+
+export interface RatesJacobianRow {
+  output_tenor: number;
+  output_tenor_label: string;
+  sensitivities: Record<string, number>;
+}
+
+export interface RatesWorkbenchResponse {
+  valuation_date: string;
+  curve_name: string;
+  library_version: string | null;
+  summary: {
+    quote_count: number;
+    five_year_zero_rate: number;
+    five_year_par_swap_rate: number;
+    two_year_par_swap_rate: number;
+    fixed_rate_bond_price: number;
+    total_key_rate_dv01: number;
+    max_calibration_error_bps: number;
+  };
+  quotes: RatesQuote[];
+  curve_points: RatesCurvePoint[];
+  calibration: RatesCalibrationRow[];
+  key_rate_dv01: RatesKeyRateDv01[];
+  jacobian: RatesJacobianRow[];
   generated_code: string;
   diagnostics: RunDiagnostics;
 }

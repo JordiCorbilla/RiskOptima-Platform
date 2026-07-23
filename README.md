@@ -6,9 +6,9 @@
 
 Full-stack institutional portfolio risk platform powered by synthetic data and the published [RiskOptima](https://pypi.org/project/riskoptima/) Python package.
 
-Platform version: `0.2.0`. RiskOptima package version: `2.5.2`.
+Platform version: `0.3.0`. RiskOptima package version: `2.7.0`.
 
-The platform demonstrates a production-style quant workflow: editable portfolio books, deterministic synthetic market generation, dated portfolio risk runs, VaR/CVaR, drawdown, volatility, beta, factor exposure, marginal VaR, component VaR, RiskOptima efficient frontier analytics, library capability exploration, options/Greeks/IV surfaces, SMA backtest studio, notebook workbenches, per-instrument drilldowns, and stress testing.
+The platform demonstrates a production-style quant workflow: editable portfolio books, deterministic synthetic market generation, dated portfolio risk runs, VaR/CVaR, drawdown, volatility, beta, factor exposure, marginal VaR, component VaR, RiskOptima efficient frontier analytics, library capability exploration, institutional SOFR curve analytics, options/Greeks/IV surfaces, SMA backtest studio, notebook workbenches, per-instrument drilldowns, and stress testing.
 
 ## Screenshots
 
@@ -16,21 +16,25 @@ RiskOptima branded navigation:
 
 ![RiskOptima branded sidebar](docs/screenshots/sidebar-brand.png)
 
-Portfolio risk overview with the current RiskOptima 2.5.2 engine:
+Portfolio risk overview with the current RiskOptima 2.7.0 engine:
 
 ![RiskOptima Platform desktop dashboard](docs/screenshots/dashboard-desktop.png)
 
 RiskOptima Library Explorer:
 
-![RiskOptima Library Explorer](docs/screenshots/riskoptima-explorer-252.png)
+![RiskOptima Library Explorer](docs/screenshots/riskoptima-explorer-270.png)
 
 Options Workbench:
 
-![RiskOptima Options Workbench](docs/screenshots/options-workbench-252.png)
+![RiskOptima Options Workbench](docs/screenshots/options-workbench-270.png)
+
+Rates Workbench:
+
+![RiskOptima Rates Workbench](docs/screenshots/rates-workbench-270.png)
 
 Backtest Studio:
 
-![RiskOptima Backtest Studio](docs/screenshots/backtest-studio-252.png)
+![RiskOptima Backtest Studio](docs/screenshots/backtest-studio-270.png)
 
 Risk dashboard in action:
 
@@ -97,7 +101,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
-The backend installs `riskoptima==2.5.2` from PyPI. For local RiskOptima library development only, set `RISKOPTIMA_PLATFORM_RISKOPTIMA_PATH` to a checkout path before starting FastAPI.
+The backend installs `riskoptima==2.7.0` from PyPI. For local RiskOptima library development only, set `RISKOPTIMA_PLATFORM_RISKOPTIMA_PATH` to a checkout path before starting FastAPI.
 
 Frontend:
 
@@ -107,7 +111,7 @@ npm install
 npm run dev
 ```
 
-The main dashboard module menu includes Portfolio Risk, RiskOptima Explorer, Options Workbench, Backtest Studio, and Economic Calendar. Run the .NET calendar backend on `http://127.0.0.1:5176`; the main Vite app proxies `/calendar-api` to it.
+The main dashboard module menu includes Portfolio Risk, RiskOptima Explorer, Options Workbench, Rates Workbench, Backtest Studio, and Economic Calendar. Run the .NET calendar backend on `http://127.0.0.1:5176`; the main Vite app proxies `/calendar-api` to it.
 
 Open `http://localhost:5173` and either load a built-in sample portfolio from the sidebar or upload one of the CSV files in `sample_data`, such as `institutional_portfolio.csv` or `vanguard_multi_asset_portfolio.csv`. The UI lets you edit positions, save the portfolio definition, choose a start date and as-of date, generate a cached run, or force a recalculation.
 
@@ -149,6 +153,7 @@ For a production-style local server setup, see [docs/on-prem-deployment.md](docs
 - `GET /api/library/metadata`
 - `GET /api/library/capabilities`
 - `POST /api/library/run-example`
+- `GET /api/rates/sofr-curve`
 - `GET /api/portfolios/{id}`
 - `PUT /api/portfolios/{id}`
 - `GET /api/portfolios/{id}/risk`
@@ -196,7 +201,17 @@ Each generated portfolio run can be paired with a dated signal report so users c
 
 The RiskOptima Explorer exposes package metadata, import source, local checkout status, platform version, a searchable capability map, and deterministic runnable examples with generated Python snippets.
 
-The Options Workbench calls RiskOptima 2.5.2 option-chain, implied-volatility surface, Greeks grid, scenario-grid, and event-straddle APIs against deterministic synthetic holdings.
+The Options Workbench calls RiskOptima 2.7.0 option-chain, implied-volatility surface, Greeks grid, scenario-grid, and event-straddle APIs against deterministic synthetic holdings.
+
+The Rates Workbench calls RiskOptima 2.7.0 institutional rates APIs directly:
+
+- `bootstrap_sofr_curve`
+- `reprice_sofr_instruments`
+- `curve_calibration_jacobian`
+- `key_rate_dv01`
+- `price_fixed_rate_bond_dates`
+
+It builds a deterministic SOFR curve from synthetic deposits, FOMC intervals, futures, and OIS swaps, then shows zero/forward/par-swap curves, calibration errors, quote sensitivities, fixed-rate bond pricing, and key-rate DV01 attribution.
 
 The Backtest Studio calls `SMACrossStrategy`, `run_backtest`, `BacktestConfig`, `SimpleCostModel`, and SMA trade extraction, then compares the SMA result against static and optimized max-Sharpe allocation baselines.
 
@@ -212,6 +227,7 @@ Current platform coverage:
 - `08-credit_risk_model_demo.ipynb`: expected loss, credit VaR/CVaR, migration, and Merton PD views.
 - `01-bond_analytics_riskoptima.ipynb`: cash-flow duration, modified duration, PVBP, and convexity drilldowns.
 - `04-Stochastic_Volatility_Models_RiskOptima.ipynb`: Hull-White, Heston, and SABR scenario paths.
+- `13-institutional_risk_engine_demo.ipynb`: option book analytics, constrained optimization, risk attribution, scenario sets, and institutional curve analytics now surfaced through the Options, Backtest, Risk, and Rates workbenches.
 
 Yahoo-dependent notebook functions are represented with synthetic structured inputs so the public demo remains deterministic and credential-free.
 

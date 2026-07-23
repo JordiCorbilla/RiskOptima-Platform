@@ -12,6 +12,7 @@ Base URL: `http://127.0.0.1:8000/api`
 | GET | `/library/metadata` | Return RiskOptima package, import source, local override, Python, and platform version metadata. |
 | GET | `/library/capabilities` | Return the structured RiskOptima capability map surfaced by the platform. |
 | POST | `/library/run-example` | Run deterministic RiskOptima examples with generated Python snippets. |
+| GET | `/rates/sofr-curve` | Build the deterministic institutional SOFR curve workbench payload. |
 | GET | `/portfolios/{id}` | Get editable portfolio details. |
 | PUT | `/portfolios/{id}` | Save edited portfolio name, base currency, and positions. |
 | GET | `/portfolios/{id}/risk` | Build the full risk dashboard payload. |
@@ -48,8 +49,8 @@ Generated runs include `diagnostics` and `metadata` with platform version, RiskO
 ```json
 {
   "status": "ok",
-  "platform_version": "0.2.0",
-  "riskoptima_version": "2.5.2"
+  "platform_version": "0.3.0",
+  "riskoptima_version": "2.7.0"
 }
 ```
 
@@ -65,7 +66,13 @@ Generated runs include `diagnostics` and `metadata` with platform version, RiskO
 }
 ```
 
-Supported examples are `black_scholes_price`, `greeks`, `implied_volatility`, `var_cvar`, `volatility_estimator`, `optimizer`, and `merton_pd`.
+Supported examples are `black_scholes_price`, `greeks`, `implied_volatility`, `var_cvar`, `volatility_estimator`, `optimizer`, `merton_pd`, and `sofr_curve`.
+
+## Rates Workbench
+
+`GET /rates/sofr-curve?valuation_date=2026-07-01`
+
+The response includes deterministic SOFR market quotes, zero/forward/par-swap curve points, calibration errors, quote-to-curve-node Jacobian rows, key-rate DV01 attribution, fixed-rate bond pricing, diagnostics, and generated RiskOptima code.
 
 ## Signal Report
 

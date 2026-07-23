@@ -10,7 +10,8 @@ const examples: Array<{ value: LibraryExample; label: string }> = [
   { value: "var_cvar", label: "VaR / CVaR" },
   { value: "volatility_estimator", label: "Volatility Estimator" },
   { value: "optimizer", label: "Optimizer" },
-  { value: "merton_pd", label: "Merton PD" }
+  { value: "merton_pd", label: "Merton PD" },
+  { value: "sofr_curve", label: "SOFR Curve" }
 ];
 
 function valueText(value: unknown) {
@@ -82,8 +83,8 @@ export function RiskOptimaExplorer() {
         </article>
         <article className="metric-card">
           <div className="metric-card__header">Platform Version</div>
-          <strong>{metadata?.platform_version ?? "0.2.0"}</strong>
-          <p>{metadata?.platform_engine_version ?? "riskoptima-platform-0.2.0"}</p>
+          <strong>{metadata?.platform_version ?? "0.3.0"}</strong>
+          <p>{metadata?.platform_engine_version ?? "riskoptima-platform-0.3.0"}</p>
         </article>
         <article className="metric-card">
           <div className="metric-card__header">Surfaced Capabilities</div>

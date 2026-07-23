@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Activity, BookOpen, CalendarDays, FlaskConical, LineChart, Plus, RefreshCw, Save, Trash2, UploadCloud } from "lucide-react";
+import { Activity, BookOpen, CalendarDays, FlaskConical, Landmark, LineChart, Plus, RefreshCw, Save, Trash2, UploadCloud } from "lucide-react";
 import { EconomicCalendar } from "./components/EconomicCalendar";
 import { InstrumentDrawer } from "./components/InstrumentDrawer";
 import { ContributorsTable, CorrelationMatrixTable, PortfolioDetailsTable, StressScenarioTable } from "./components/Tables";
@@ -10,6 +10,7 @@ import { OptimizationCharts, RiskCharts } from "./components/RiskCharts";
 import { SignalWorkbench } from "./components/SignalWorkbench";
 import { BacktestStudio } from "./modules/backtest-studio/BacktestStudio";
 import { OptionsWorkbench } from "./modules/options-workbench/OptionsWorkbench";
+import { RatesWorkbench } from "./modules/rates-workbench/RatesWorkbench";
 import { RiskOptimaExplorer } from "./modules/riskoptima-explorer/RiskOptimaExplorer";
 import {
   generatePortfolioRun,
@@ -38,8 +39,8 @@ import { formatCurrency, formatPercent } from "./utils";
 const assetClasses = ["Equity", "Fixed Income", "Credit", "Commodity", "Cash", "Alternative"];
 const sections = ["Overview", "Risk", "Optimization", "Signals", "Stress", "Workbench", "Renders"] as const;
 type Section = (typeof sections)[number];
-type PlatformModule = "portfolio-risk" | "riskoptima-explorer" | "options-workbench" | "backtest-studio" | "economic-calendar";
-const platformVersion = "0.2.0";
+type PlatformModule = "portfolio-risk" | "riskoptima-explorer" | "options-workbench" | "rates-workbench" | "backtest-studio" | "economic-calendar";
+const platformVersion = "0.3.0";
 
 function previousBusinessDateString(base = new Date()) {
   const value = new Date(base);
@@ -111,6 +112,7 @@ export function App() {
       setPortfolioDetail(detail);
       setRunHistory(await listPortfolioRuns(portfolioId));
       setErrorMessage(null);
+      setStatus(`Loaded ${detail.name}. Generate the dated run or force a recalculation when ready.`);
     } catch (error) {
       setPortfolioDetail(null);
       setRunHistory([]);
@@ -340,6 +342,14 @@ export function App() {
             <span>Options Workbench</span>
           </button>
           <button
+            className={activeModule === "rates-workbench" ? "module-link module-link--active" : "module-link"}
+            type="button"
+            onClick={() => setActiveModule("rates-workbench")}
+          >
+            <Landmark size={17} />
+            <span>Rates Workbench</span>
+          </button>
+          <button
             className={activeModule === "backtest-studio" ? "module-link module-link--active" : "module-link"}
             type="button"
             onClick={() => setActiveModule("backtest-studio")}
@@ -418,6 +428,8 @@ export function App() {
           <RiskOptimaExplorer />
         ) : activeModule === "options-workbench" ? (
           <OptionsWorkbench portfolio={portfolioDetail} portfolioId={selectedId} startDate={startDate} asOfDate={asOfDate} />
+        ) : activeModule === "rates-workbench" ? (
+          <RatesWorkbench />
         ) : activeModule === "backtest-studio" ? (
           <BacktestStudio
             portfolio={portfolioDetail}
