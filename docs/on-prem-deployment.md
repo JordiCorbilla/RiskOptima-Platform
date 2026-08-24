@@ -75,7 +75,7 @@ Expected health shape:
 
 ## Cloudflare Quick Tunnel
 
-The Cloudflare tunnel is not started by the default on-prem command because v1 has no authentication. Start it explicitly when you want a temporary external review URL.
+The Cloudflare tunnel is not started by the default on-prem command because v1 has no authentication. Start it explicitly when you want a temporary external review URL. This uses Cloudflare Quick Tunnel, so it does not require a paid plan, custom domain, or named tunnel setup.
 
 Recommended launcher:
 
@@ -87,7 +87,10 @@ The script starts Docker Compose with the `tunnel` profile, waits for Cloudflare
 
 ```text
 Cloudflare tunnel URL: https://<generated-name>.trycloudflare.com
+URL saved to: C:\deploy\RiskOptima-Platform\runtime\cloudflare-tunnel-url.txt
 ```
+
+The saved URL file is intentionally git-ignored. It is the handoff point for later automation, such as publishing the current temporary URL to a Telegram channel after the platform starts.
 
 Legacy Compose:
 
@@ -102,7 +105,7 @@ docker compose --profile tunnel up -d --build
 docker compose logs -f tunnel
 ```
 
-Look for the `https://...trycloudflare.com` URL in the `tunnel` service logs. The URL is ephemeral and can change when the tunnel container restarts. For a stable production URL, create a named Cloudflare Tunnel with your own domain and token in v2.
+Look for the `https://...trycloudflare.com` URL in the `tunnel` service logs. The URL is ephemeral and can change when the tunnel container restarts.
 
 ## RiskOptima Platform 0.3.1 Launch Runbook
 

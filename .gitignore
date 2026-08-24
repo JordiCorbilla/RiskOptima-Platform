@@ -17,4 +17,5 @@ dist/
 # Local environment
 .env
 .DS_Store
+runtime/
 BLOG_POST_RISKOPTIMA_PLATFORM.md

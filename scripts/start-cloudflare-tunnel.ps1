@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [int] $TimeoutSeconds = 180,
-    [switch] $LegacyCompose
+    [switch] $LegacyCompose,
+    [string] $UrlOutputPath = "runtime\cloudflare-tunnel-url.txt"
 )
 
 $ErrorActionPreference = "Stop"
@@ -26,6 +27,11 @@ function Resolve-ComposeCommand {
     }
 
     throw "Docker Compose was not found. Install Docker Compose v2 or legacy docker-compose."
+}
+
+$RepoRoot = Split-Path -Parent $PSScriptRoot
+if (-not [System.IO.Path]::IsPathRooted($UrlOutputPath)) {
+    $UrlOutputPath = Join-Path $RepoRoot $UrlOutputPath
 }
 
 $script:ComposeCommand = Resolve-ComposeCommand
@@ -68,8 +74,16 @@ while ((Get-Date) -lt $deadline) {
     $match = [regex]::Match($logs, $urlPattern)
 
     if ($match.Success) {
+        $tunnelUrl = $match.Value
+        $outputDirectory = Split-Path -Parent $UrlOutputPath
+        if (-not [string]::IsNullOrWhiteSpace($outputDirectory)) {
+            New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
+        }
+        Set-Content -Path $UrlOutputPath -Value $tunnelUrl -Encoding ASCII
+
         Write-Host ""
-        Write-Host "Cloudflare tunnel URL: $($match.Value)"
+        Write-Host "Cloudflare tunnel URL: $tunnelUrl"
+        Write-Host "URL saved to: $UrlOutputPath"
         Write-Host ""
         Write-Host "Follow live tunnel logs with:"
         if ($script:ComposeCommand.Count -eq 1) {

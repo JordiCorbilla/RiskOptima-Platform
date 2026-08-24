@@ -147,7 +147,7 @@ For a temporary Cloudflare review URL, run:
 .\scripts\start-cloudflare-tunnel.ps1
 ```
 
-The script starts the optional `tunnel` Compose profile and prints the generated `https://*.trycloudflare.com` URL from the Cloudflare logs.
+The script starts the optional `tunnel` Compose profile, prints the generated free random `https://*.trycloudflare.com` URL from the Cloudflare logs, and saves it to `runtime/cloudflare-tunnel-url.txt` for later automation such as Telegram publishing.
 
 For a production-style local server setup, see [docs/on-prem-deployment.md](docs/on-prem-deployment.md).
 
