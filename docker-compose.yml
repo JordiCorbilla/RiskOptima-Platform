@@ -32,6 +32,15 @@ services:
     ports:
       - "127.0.0.1:5176:8080"
 
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    depends_on:
+      - web
+    command: tunnel --no-autoupdate --url http://web:80
+    profiles:
+      - tunnel
+    restart: unless-stopped
+
 volumes:
   riskoptima-sqlite:
   riskoptima-generated-runs:

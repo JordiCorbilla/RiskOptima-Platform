@@ -141,6 +141,14 @@ docker compose up -d --build
 
 The containerized frontend is exposed on `http://localhost:8080` and proxies `/api` to FastAPI plus `/calendar-api` to the economic-calendar API. Direct diagnostic ports are bound to loopback only at `http://localhost:8000` for FastAPI and `http://localhost:5176` for the calendar API.
 
+For a temporary Cloudflare review URL, run:
+
+```powershell
+.\scripts\start-cloudflare-tunnel.ps1
+```
+
+The script starts the optional `tunnel` Compose profile and prints the generated `https://*.trycloudflare.com` URL from the Cloudflare logs.
+
 For a production-style local server setup, see [docs/on-prem-deployment.md](docs/on-prem-deployment.md).
 
 ## API

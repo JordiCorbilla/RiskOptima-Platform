@@ -73,6 +73,37 @@ Expected health shape:
 }
 ```
 
+## Cloudflare Quick Tunnel
+
+The Cloudflare tunnel is not started by the default on-prem command because v1 has no authentication. Start it explicitly when you want a temporary external review URL.
+
+Recommended launcher:
+
+```powershell
+.\scripts\start-cloudflare-tunnel.ps1
+```
+
+The script starts Docker Compose with the `tunnel` profile, waits for Cloudflare to create the URL, and prints:
+
+```text
+Cloudflare tunnel URL: https://<generated-name>.trycloudflare.com
+```
+
+Legacy Compose:
+
+```powershell
+.\scripts\start-cloudflare-tunnel.ps1 -LegacyCompose
+```
+
+Manual equivalent:
+
+```powershell
+docker compose --profile tunnel up -d --build
+docker compose logs -f tunnel
+```
+
+Look for the `https://...trycloudflare.com` URL in the `tunnel` service logs. The URL is ephemeral and can change when the tunnel container restarts. For a stable production URL, create a named Cloudflare Tunnel with your own domain and token in v2.
+
 ## RiskOptima Platform 0.3.1 Launch Runbook
 
 Use this when releasing the current `main` branch to the on-prem server.
@@ -104,6 +135,12 @@ Select-String -Path backend\app\core\version.py -Pattern '0.3.1'
 
 ```powershell
 docker compose up -d --build
+```
+
+Optional external review URL:
+
+```powershell
+.\scripts\start-cloudflare-tunnel.ps1
 ```
 
 Legacy Compose alternative:
@@ -146,6 +183,7 @@ Invoke-RestMethod http://localhost:8080/calendar-api/events/today
 | `8080` | frontend Nginx | Main user-facing app |
 | `127.0.0.1:8000` | FastAPI | Local-only direct API diagnostics on the server |
 | `127.0.0.1:5176` | calendar API | Local-only economic-calendar diagnostics on the server |
+| Cloudflare quick tunnel | `tunnel` profile | Optional temporary external URL |
 
 For normal users, expose only `8080` internally. The direct diagnostic ports are bound to loopback by default; reach them from the server itself or through the Nginx frontend paths `/api` and `/calendar-api`.
 
