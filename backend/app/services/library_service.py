@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from importlib.metadata import PackageNotFoundError, version
 from importlib.util import find_spec
 from pathlib import Path
 import platform
@@ -11,16 +10,13 @@ import pandas as pd
 from app.core.config import get_settings
 from app.core.version import PLATFORM_ENGINE_VERSION, PLATFORM_VERSION
 from app.domain.models import ExampleRunRequest, ExampleRunResponse, LibraryCapability, LibraryMetadata, RunDiagnostics
-from app.services.risk_service import _ensure_riskoptima_path
+from app.services.risk_service import _ensure_riskoptima_path, riskoptima_import_version
 
 
 def get_library_metadata() -> LibraryMetadata:
     _ensure_riskoptima_path()
     spec = find_spec("riskoptima")
-    try:
-        package_version = version("riskoptima")
-    except PackageNotFoundError:
-        package_version = None
+    package_version = riskoptima_import_version()
     source = spec.origin if spec and spec.origin else None
     configured = get_settings().riskoptima_path
     local_override = bool(configured and source and str(configured.resolve()).lower() in str(Path(source).resolve()).lower())
@@ -55,6 +51,7 @@ def list_library_capabilities() -> list[LibraryCapability]:
         ("riskoptima.rates", "reprice_sofr_instruments", "rates", True, "/api/rates/sofr-curve", "Rates Workbench", "Calibration diagnostics for mixed money-market, futures, and OIS instruments."),
         ("riskoptima.rates", "curve_calibration_jacobian", "rates", True, "/api/rates/sofr-curve", "Rates Workbench", "Quote-to-curve-node sensitivity matrix for calibration transparency."),
         ("riskoptima.rates", "key_rate_dv01", "rates", True, "/api/rates/sofr-curve", "Rates Workbench", "Key-rate DV01 attribution for fixed-income exposure against the calibrated curve."),
+        ("riskoptima.data", "load_sample_market_returns / load_sample_credit_portfolio", "sample data", True, "/api/library/run-example", "RiskOptima Explorer", "Packaged deterministic market-return and credit-obligor samples introduced in RiskOptima 2.7.1."),
         ("riskoptima.credit", "expected_loss / credit_var / credit_cvar / merton_pd", "credit", True, "/api/portfolios/{id}/notebooks", "RiskOptima Explorer", "Synthetic credit expected loss, VaR/CVaR, migration, and Merton PD views."),
         ("riskoptima.RiskOptima", "macaulay_duration_v3", "fixed income", True, "/api/portfolios/{id}/notebooks", "RiskOptima Explorer", "Duration, modified duration, PVBP, and convexity measures."),
         ("riskoptima.reporting", "build_markov_regime_report", "regimes", True, "/api/portfolios/{id}/notebooks", "RiskOptima Explorer", "Markov regime probabilities, summaries, and transition matrix."),
@@ -187,6 +184,45 @@ def run_library_example(request: ExampleRunRequest) -> ExampleRunResponse:
         code = workbench.generated_code
         diagnostics = workbench.diagnostics
         title = "SOFR Curve Workbench"
+    elif example == "sample_data":
+        from riskoptima.credit import portfolio_expected_loss
+        from riskoptima.data import load_sample_credit_portfolio, load_sample_market_returns
+        from riskoptima.reporting import build_market_risk_report
+
+        market = load_sample_market_returns()
+        credit = load_sample_credit_portfolio()
+        report = build_market_risk_report(market, weights=[0.35, 0.30, 0.20, 0.15])
+        metrics = getattr(report, "metrics", {})
+        historical_var = metrics.get("historical_var", {}) if isinstance(metrics, dict) else {}
+        inputs = {
+            "market_rows": len(market),
+            "market_columns": list(market.columns),
+            "credit_rows": len(credit),
+            "credit_columns": list(credit.columns),
+        }
+        result = {
+            "annualized_volatility": float(metrics.get("annualized_volatility", 0.0)),
+            "historical_var_99": float(historical_var.get(0.99, 0.0)),
+            "credit_expected_loss": float(portfolio_expected_loss(credit)),
+        }
+        code = (
+            "from riskoptima.data import load_sample_market_returns, load_sample_credit_portfolio\n"
+            "from riskoptima.reporting import build_market_risk_report\n"
+            "from riskoptima.credit import portfolio_expected_loss\n"
+            "market = load_sample_market_returns()\n"
+            "credit = load_sample_credit_portfolio()\n"
+            "report = build_market_risk_report(market, weights=[0.35, 0.30, 0.20, 0.15])\n"
+            "expected_loss = portfolio_expected_loss(credit)"
+        )
+        diagnostics.functions_executed.extend(
+            [
+                "riskoptima.data.load_sample_market_returns",
+                "riskoptima.data.load_sample_credit_portfolio",
+                "riskoptima.reporting.build_market_risk_report",
+                "riskoptima.credit.portfolio_expected_loss",
+            ]
+        )
+        title = "Packaged Sample Data"
     else:
         raise ValueError(f"Unsupported example: {example}")
 

@@ -49,8 +49,8 @@ Generated runs include `diagnostics` and `metadata` with platform version, RiskO
 ```json
 {
   "status": "ok",
-  "platform_version": "0.3.0",
-  "riskoptima_version": "2.7.0"
+  "platform_version": "0.3.1",
+  "riskoptima_version": "2.7.1"
 }
 ```
 
@@ -66,7 +66,7 @@ Generated runs include `diagnostics` and `metadata` with platform version, RiskO
 }
 ```
 
-Supported examples are `black_scholes_price`, `greeks`, `implied_volatility`, `var_cvar`, `volatility_estimator`, `optimizer`, `merton_pd`, and `sofr_curve`.
+Supported examples are `black_scholes_price`, `greeks`, `implied_volatility`, `var_cvar`, `volatility_estimator`, `optimizer`, `merton_pd`, `sofr_curve`, and `sample_data`.
 
 ## Rates Workbench
 

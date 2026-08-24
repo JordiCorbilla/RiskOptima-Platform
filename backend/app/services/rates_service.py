@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from datetime import date
 from functools import lru_cache
-from importlib.metadata import PackageNotFoundError, version
 from time import perf_counter
 from typing import Any
 
@@ -18,7 +17,7 @@ from app.domain.models import (
     RatesWorkbenchResponse,
     RunDiagnostics,
 )
-from app.services.risk_service import _ensure_riskoptima_path
+from app.services.risk_service import _ensure_riskoptima_path, riskoptima_import_version
 
 
 DEFAULT_RATES_VALUATION_DATE = date(2026, 7, 1)
@@ -98,10 +97,7 @@ def _synthetic_sofr_quotes(valuation_date: date) -> pd.DataFrame:
 
 
 def _package_version() -> str | None:
-    try:
-        return version("riskoptima")
-    except PackageNotFoundError:
-        return None
+    return riskoptima_import_version()
 
 
 def _quote_models(quotes: pd.DataFrame) -> list[RatesQuote]:

@@ -1,12 +1,12 @@
 # Architecture
 
-RiskOptima Platform `0.3.0` is split into explicit layers:
+RiskOptima Platform `0.3.1` is split into explicit layers:
 
 1. React + TypeScript dashboard for upload, portfolio editing, dated runs, charts, and risk tables.
 2. FastAPI REST API for portfolio ingestion, reports, and scenarios.
 3. Domain and repository layer that persists portfolios to SQLite behind an interface.
 4. Generated-run cache that stores report/chart JSON by deterministic portfolio/date hash.
-5. Analytics layer that uses synthetic market data and the published `riskoptima==2.7.0` package's market-risk, factor, optimization, options, volatility, credit, rates, regime, and signal/backtest APIs.
+5. Analytics layer that uses synthetic market data and the published `riskoptima==2.7.1` package's market-risk, factor, optimization, options, volatility, credit, rates, packaged sample-data, regime, and signal/backtest APIs.
 6. Deployment layer that can run as a single on-prem Docker Compose stack with Nginx proxying `/api` and `/calendar-api`.
 
 ```mermaid
@@ -47,9 +47,10 @@ The repository interface is deliberately small: save, list, get, and update port
 9. The platform enriches the report with marginal VaR, component VaR, factor exposures, stress results, chart-ready time series, and notebook-style rendered RiskOptima charts.
 10. The signal service reuses the same dated synthetic prices to run RiskOptima SMA signal frames and the backtest engine for instrument drilldowns.
 11. The Library Explorer exposes package metadata, capability coverage, deterministic examples, diagnostics, and generated Python snippets.
-12. The Options Workbench calls RiskOptima 2.7.0 option-chain, Greeks-grid, IV-surface, scenario-grid, and event-straddle APIs.
-13. The Rates Workbench calls RiskOptima 2.7.0 dated SOFR curve, calibration, Jacobian, key-rate DV01, and fixed-rate bond pricing APIs.
-14. The Backtest Studio calls RiskOptima strategy/backtest APIs and compares static, SMA, and optimized allocation baselines.
+12. The Options Workbench calls RiskOptima 2.7.1 option-chain, Greeks-grid, IV-surface, scenario-grid, and event-straddle APIs.
+13. The Rates Workbench calls RiskOptima 2.7.1 dated SOFR curve, calibration, Jacobian, key-rate DV01, and fixed-rate bond pricing APIs.
+14. The Library Explorer surfaces RiskOptima 2.7.1 packaged sample loaders through a deterministic sample-data example.
+15. The Backtest Studio calls RiskOptima strategy/backtest APIs and compares static, SMA, and optimized allocation baselines.
 
 ## Synthetic Data
 
@@ -82,4 +83,4 @@ Additional notebook surfaces are exposed as a separate workbench rather than ove
 - fixed-income duration/convexity analytics
 - stochastic volatility scenario models
 
-The notebooks that rely on live Yahoo data are represented through deterministic synthetic data and structured payloads. That keeps the flagship demo reproducible while preserving the analytical intent of the library examples. Production and Docker installs use `riskoptima==2.7.0` from PyPI; local checkout overrides are reserved for library development.
+The notebooks that rely on live Yahoo data are represented through deterministic synthetic data and structured payloads. That keeps the flagship demo reproducible while preserving the analytical intent of the library examples. Production and Docker installs use `riskoptima==2.7.1` from PyPI; local checkout overrides are reserved for library development.

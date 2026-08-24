@@ -40,7 +40,7 @@ const assetClasses = ["Equity", "Fixed Income", "Credit", "Commodity", "Cash", "
 const sections = ["Overview", "Risk", "Optimization", "Signals", "Stress", "Workbench", "Renders"] as const;
 type Section = (typeof sections)[number];
 type PlatformModule = "portfolio-risk" | "riskoptima-explorer" | "options-workbench" | "rates-workbench" | "backtest-studio" | "economic-calendar";
-const platformVersion = "0.3.0";
+const platformVersion = "0.3.1";
 
 function previousBusinessDateString(base = new Date()) {
   const value = new Date(base);

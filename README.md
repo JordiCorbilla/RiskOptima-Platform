@@ -6,7 +6,7 @@
 
 Full-stack institutional portfolio risk platform powered by synthetic data and the published [RiskOptima](https://pypi.org/project/riskoptima/) Python package.
 
-Platform version: `0.3.0`. RiskOptima package version: `2.7.0`.
+Platform version: `0.3.1`. RiskOptima package version: `2.7.1`.
 
 The platform demonstrates a production-style quant workflow: editable portfolio books, deterministic synthetic market generation, dated portfolio risk runs, VaR/CVaR, drawdown, volatility, beta, factor exposure, marginal VaR, component VaR, RiskOptima efficient frontier analytics, library capability exploration, institutional SOFR curve analytics, options/Greeks/IV surfaces, SMA backtest studio, notebook workbenches, per-instrument drilldowns, and stress testing.
 
@@ -16,7 +16,7 @@ RiskOptima branded navigation:
 
 ![RiskOptima branded sidebar](docs/screenshots/sidebar-brand.png)
 
-Portfolio risk overview with the current RiskOptima 2.7.0 engine:
+Portfolio risk overview with the current RiskOptima 2.7.1 engine:
 
 ![RiskOptima Platform desktop dashboard](docs/screenshots/dashboard-desktop.png)
 
@@ -101,7 +101,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
-The backend installs `riskoptima==2.7.0` from PyPI. For local RiskOptima library development only, set `RISKOPTIMA_PLATFORM_RISKOPTIMA_PATH` to a checkout path before starting FastAPI.
+The backend installs `riskoptima==2.7.1` from PyPI. For local RiskOptima library development only, set `RISKOPTIMA_PLATFORM_RISKOPTIMA_PATH` to a checkout path before starting FastAPI.
 
 Frontend:
 
@@ -199,11 +199,11 @@ The signal workbench calls RiskOptima's SMA helpers and backtest engine:
 
 Each generated portfolio run can be paired with a dated signal report so users can click a holding and inspect close price, SMA bands, buy/sell crossovers, trade history, win rate, drawdown, and strategy equity path.
 
-The RiskOptima Explorer exposes package metadata, import source, local checkout status, platform version, a searchable capability map, and deterministic runnable examples with generated Python snippets.
+The RiskOptima Explorer exposes package metadata, import source, local checkout status, platform version, a searchable capability map, and deterministic runnable examples with generated Python snippets. RiskOptima 2.7.1 packaged sample loaders are surfaced through the `Packaged Sample Data` example, which loads deterministic market returns and a credit obligor portfolio directly from the library.
 
-The Options Workbench calls RiskOptima 2.7.0 option-chain, implied-volatility surface, Greeks grid, scenario-grid, and event-straddle APIs against deterministic synthetic holdings.
+The Options Workbench calls RiskOptima 2.7.1 option-chain, implied-volatility surface, Greeks grid, scenario-grid, and event-straddle APIs against deterministic synthetic holdings.
 
-The Rates Workbench calls RiskOptima 2.7.0 institutional rates APIs directly:
+The Rates Workbench calls RiskOptima 2.7.1 institutional rates APIs directly:
 
 - `bootstrap_sofr_curve`
 - `reprice_sofr_instruments`

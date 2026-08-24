@@ -1,6 +1,6 @@
 # Rates Workbench
 
-The Rates Workbench uses deterministic synthetic money-market and swap quotes to call RiskOptima 2.7.0 institutional rates analytics directly.
+The Rates Workbench uses deterministic synthetic money-market and swap quotes to call RiskOptima 2.7.1 institutional rates analytics directly.
 
 Current RiskOptima APIs used:
 

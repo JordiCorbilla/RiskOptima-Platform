@@ -194,7 +194,7 @@ class LibraryCapability(BaseModel):
 
 class ExampleRunRequest(BaseModel):
     example: str = Field(
-        pattern="^(black_scholes_price|greeks|implied_volatility|var_cvar|volatility_estimator|optimizer|merton_pd|sofr_curve)$"
+        pattern="^(black_scholes_price|greeks|implied_volatility|var_cvar|volatility_estimator|optimizer|merton_pd|sofr_curve|sample_data)$"
     )
 
 
@@ -229,6 +229,8 @@ class RatesCurvePoint(BaseModel):
 
 
 class RatesCalibrationRow(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
     quote_id: str
     instrument_type: str
     start_date: str

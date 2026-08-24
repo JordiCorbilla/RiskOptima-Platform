@@ -1,6 +1,6 @@
 # On-Prem Deployment
 
-This guide describes a local server deployment for RiskOptima Platform `0.3.0` with the pinned `riskoptima==2.7.0` package.
+This guide describes a local server deployment for RiskOptima Platform `0.3.1` with the pinned `riskoptima==2.7.1` package.
 
 The recommended v1 deployment is Docker Compose on a single internal server. It runs one public web endpoint and keeps the FastAPI portfolio API plus the .NET economic-calendar API behind the frontend Nginx proxy.
 
@@ -56,8 +56,8 @@ Expected health shape:
 ```json
 {
   "status": "ok",
-  "platform_version": "0.3.0",
-  "riskoptima_version": "2.7.0"
+  "platform_version": "0.3.1",
+  "riskoptima_version": "2.7.1"
 }
 ```
 
@@ -192,7 +192,7 @@ Invoke-RestMethod http://localhost:8080/api/health
 Invoke-RestMethod http://localhost:8080/api/library/metadata
 ```
 
-6. In the UI, load a sample portfolio, generate a run, open RiskOptima Explorer, Options Workbench, Backtest Studio, and Economic Calendar.
+6. In the UI, load a sample portfolio, generate a run, open RiskOptima Explorer, Options Workbench, Rates Workbench, Backtest Studio, and Economic Calendar.
 
 ## Rollback
 

@@ -167,7 +167,8 @@ export type LibraryExample =
   | "volatility_estimator"
   | "optimizer"
   | "merton_pd"
-  | "sofr_curve";
+  | "sofr_curve"
+  | "sample_data";
 
 export interface ExampleRunResponse {
   example: LibraryExample;

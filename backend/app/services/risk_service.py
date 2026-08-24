@@ -17,25 +17,36 @@ from app.services.stress_service import DEFAULT_SCENARIOS, run_stress_scenario
 
 
 def _ensure_riskoptima_path() -> None:
-    if find_spec("riskoptima") is not None:
-        return
     configured = get_settings().riskoptima_path
-    candidates = [configured] if configured is not None else []
-    for candidate in candidates:
-        resolved = candidate.resolve()
+    if configured is not None:
+        resolved = configured.resolve()
         if (resolved / "riskoptima").exists() and str(resolved) not in sys.path:
             sys.path.insert(0, str(resolved))
             return
+    if find_spec("riskoptima") is not None:
+        return
+
+
+def riskoptima_import_version() -> str | None:
+    _ensure_riskoptima_path()
+    try:
+        import riskoptima
+
+        imported_version = getattr(riskoptima, "__version__", None)
+        if imported_version:
+            return str(imported_version)
+    except Exception:
+        pass
+    try:
+        return version("riskoptima")
+    except PackageNotFoundError:
+        return None
 
 
 def riskoptima_engine_metadata() -> dict[str, str | bool | None]:
     _ensure_riskoptima_path()
     spec = find_spec("riskoptima")
-    package_version = None
-    try:
-        package_version = version("riskoptima")
-    except PackageNotFoundError:
-        package_version = None
+    package_version = riskoptima_import_version()
     configured = get_settings().riskoptima_path
     source = spec.origin if spec and spec.origin else None
     local_override = bool(configured and source and str(configured.resolve()).lower() in str(Path(source).resolve()).lower())
