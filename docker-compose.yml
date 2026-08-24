@@ -11,7 +11,7 @@ services:
       - riskoptima-sqlite:/app/data
       - riskoptima-generated-runs:/app/generated_data
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
 
   web:
     build:
@@ -30,7 +30,7 @@ services:
     volumes:
       - ./economic-calendar/data:/app/data
     ports:
-      - "5176:8080"
+      - "127.0.0.1:5176:8080"
 
 volumes:
   riskoptima-sqlite:

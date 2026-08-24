@@ -136,10 +136,10 @@ The run id is a hash of portfolio details, date range, platform engine version, 
 ## Docker
 
 ```powershell
-docker compose up --build
+docker compose up -d --build
 ```
 
-The containerized frontend is exposed on `http://localhost:8080` and proxies `/api` to FastAPI plus `/calendar-api` to the economic-calendar API. Direct diagnostic ports are also published at `http://localhost:8000` for FastAPI and `http://localhost:5176` for the calendar API.
+The containerized frontend is exposed on `http://localhost:8080` and proxies `/api` to FastAPI plus `/calendar-api` to the economic-calendar API. Direct diagnostic ports are bound to loopback only at `http://localhost:8000` for FastAPI and `http://localhost:5176` for the calendar API.
 
 For a production-style local server setup, see [docs/on-prem-deployment.md](docs/on-prem-deployment.md).
 

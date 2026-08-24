@@ -24,7 +24,7 @@ Persistent storage:
 
 ## Prerequisites
 
-- Docker Engine and Docker Compose v2.
+- Docker Engine and Docker Compose v2. Legacy `docker-compose` v1 also works with the current file, but v2 is preferred.
 - Git access to the repository.
 - Outbound internet access during image build to install Python, npm, .NET, and RiskOptima dependencies.
 - Internal DNS name or static IP for the server, for example `riskoptima.internal`.
@@ -37,10 +37,22 @@ From the repository root:
 docker compose up -d --build
 ```
 
+If the server only has legacy Compose:
+
+```powershell
+docker-compose up -d --build
+```
+
 Open:
 
 ```text
 http://localhost:8080
+```
+
+For an internal DNS name, point users to:
+
+```text
+http://riskoptima.internal:8080
 ```
 
 Operational checks:
@@ -61,15 +73,81 @@ Expected health shape:
 }
 ```
 
+## RiskOptima Platform 0.3.1 Launch Runbook
+
+Use this when releasing the current `main` branch to the on-prem server.
+If the server has legacy Compose only, replace `docker compose` with `docker-compose` in the commands below.
+
+1. Connect to the server and move to the deployment folder:
+
+```powershell
+cd C:\deploy\RiskOptima-Platform
+```
+
+2. Pull the release:
+
+```powershell
+git fetch origin
+git checkout main
+git pull --ff-only origin main
+git log -1 --oneline
+```
+
+3. Confirm the pinned versions:
+
+```powershell
+Select-String -Path backend\requirements.txt -Pattern "riskoptima==2.7.1"
+Select-String -Path backend\app\core\version.py -Pattern '0.3.1'
+```
+
+4. Build and start:
+
+```powershell
+docker compose up -d --build
+```
+
+Legacy Compose alternative:
+
+```powershell
+docker-compose up -d --build
+```
+
+5. Check containers:
+
+```powershell
+docker compose ps
+docker compose logs --tail=100 api
+docker compose logs --tail=100 web
+docker compose logs --tail=100 calendar
+```
+
+6. Verify the release:
+
+```powershell
+Invoke-RestMethod http://localhost:8080/api/health
+Invoke-RestMethod http://localhost:8080/api/library/metadata
+Invoke-RestMethod http://localhost:8080/api/rates/sofr-curve
+Invoke-RestMethod http://localhost:8080/calendar-api/events/today
+```
+
+7. Browser smoke test:
+
+- Open `http://riskoptima.internal:8080` or `http://<server-ip>:8080`.
+- Load `Vanguard Multi-Asset Model`.
+- Click **Generate** and confirm the risk dashboard renders.
+- Open **RiskOptima Explorer** and confirm RiskOptima `2.7.1` plus platform `0.3.1`.
+- Run the `Packaged Sample Data` example.
+- Open **Rates Workbench**, **Options Workbench**, **Backtest Studio**, and **Economic Calendar**.
+
 ## Ports
 
 | Port | Service | Purpose |
 | --- | --- | --- |
 | `8080` | frontend Nginx | Main user-facing app |
-| `8000` | FastAPI | Direct API access for diagnostics |
-| `5176` | calendar API | Direct economic-calendar diagnostics |
+| `127.0.0.1:8000` | FastAPI | Local-only direct API diagnostics on the server |
+| `127.0.0.1:5176` | calendar API | Local-only economic-calendar diagnostics on the server |
 
-For normal users, expose only `8080` internally. Keep `8000` and `5176` restricted to administrators or remove their published ports if all access should go through Nginx.
+For normal users, expose only `8080` internally. The direct diagnostic ports are bound to loopback by default; reach them from the server itself or through the Nginx frontend paths `/api` and `/calendar-api`.
 
 ## Persistent Data
 
