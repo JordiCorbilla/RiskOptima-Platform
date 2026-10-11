@@ -3,6 +3,7 @@ from datetime import date
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 
 from app.core.version import PLATFORM_VERSION
+from app.domain.dislocation import ResearchRequest, ResearchResponse
 from app.db.session import get_portfolio_repository
 from app.domain.models import (
     BacktestRunRequest,
@@ -40,6 +41,33 @@ from app.services.signal_service import build_signal_report
 from app.services.stress_service import get_scenario, list_scenarios, run_stress_scenario
 
 router = APIRouter()
+
+
+@router.post("/dislocation/scan", response_model=ResearchResponse)
+def scan_dislocation(
+    request: ResearchRequest,
+    repository: PortfolioRepository = Depends(get_portfolio_repository),
+) -> ResearchResponse:
+    from app.services.dislocation_service import run_research
+
+    instruments = [(symbol, symbol) for symbol in request.tickers]
+    if request.portfolio_id is not None:
+        portfolio = repository.get(request.portfolio_id)
+        if portfolio is None:
+            raise HTTPException(status_code=404, detail="Portfolio not found")
+        holdings = {position.instrument.symbol.upper(): position.instrument.name for position in portfolio.positions}
+        selected = request.tickers or list(holdings)
+        if any(symbol not in holdings for symbol in selected):
+            raise HTTPException(status_code=422, detail="Selected tickers must belong to the portfolio")
+        instruments = [(symbol, holdings[symbol]) for symbol in selected]
+    if not 1 <= len(instruments) <= 25:
+        raise HTTPException(status_code=422, detail="Select between 1 and 25 instruments")
+    try:
+        return run_research(request, instruments)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @router.get("/health")

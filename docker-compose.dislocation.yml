@@ -1,0 +1,6 @@
+services:
+  api:
+    environment:
+      RISKOPTIMA_PLATFORM_RISKOPTIMA_PATH: /opt/riskoptima
+    volumes:
+      - ${RISKOPTIMA_CHECKOUT:-C:/repo/portfolio_risk_kit}:/opt/riskoptima:ro

@@ -20,11 +20,18 @@ import type {
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
+export function scanDislocation(payload: { tickers: string[]; portfolio_id?: number; config: Record<string, string | number | boolean> }): Promise<import("../modules/dislocation-research/types").ResearchResult> {
+  return request("/dislocation/scan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, init);
   if (!response.ok) {
     const detail = await response.json().catch(() => ({ detail: response.statusText }));
-    throw new Error(detail.detail ?? "API request failed");
+    const message = Array.isArray(detail.detail)
+      ? detail.detail.map((item: { msg?: string }) => item.msg ?? "Invalid request").join("; ")
+      : typeof detail.detail === "string" ? detail.detail : "API request failed";
+    throw new Error(message);
   }
   return response.json() as Promise<T>;
 }

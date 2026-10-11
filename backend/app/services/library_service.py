@@ -34,6 +34,7 @@ def get_library_metadata() -> LibraryMetadata:
 
 def list_library_capabilities() -> list[LibraryCapability]:
     rows = [
+        ("riskoptima.dislocation", "DislocationConfig / analyze_symbol / scan_universe / generate_markdown_report", "instrument research", True, "/api/dislocation/scan", "Dislocation Research", "Instrument-level price, regime and equity valuation research; explicit coverage and provider diagnostics. Requires RiskOptima 2.8.0."),
         ("riskoptima.reporting", "build_market_risk_report", "portfolio risk", True, "/api/portfolios/{id}/risk", "Portfolio Risk", "Market risk metrics, VaR/CVaR, beta, drawdown, and return streams."),
         ("riskoptima.RiskOptima", "plot_efficient_frontier_monte_carlo", "optimization", True, "/api/portfolios/{id}/generate", "Portfolio Risk", "Efficient frontier, max-Sharpe and min-variance allocation diagnostics."),
         ("riskoptima.risk", "FactorRiskModel", "risk attribution", True, "/api/portfolios/{id}/risk", "Portfolio Risk", "Factor exposure estimation and weighted beta decomposition."),

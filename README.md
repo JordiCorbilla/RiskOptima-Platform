@@ -1,5 +1,8 @@
 # RiskOptima Platform
 
+Dislocation Research integrates the local RiskOptima 2.8.0 instrument research
+engine. See [setup, interpretation and API contract](docs/dislocation-research.md).
+
 <p align="center">
   <img src="frontend/app/public/brand/riskoptima-wordmark.png" alt="RiskOptima - Quant Tools. Real Insight." width="760" />
 </p>

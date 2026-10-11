@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Activity, BookOpen, CalendarDays, FlaskConical, Landmark, LineChart, Plus, RefreshCw, Save, Trash2, UploadCloud } from "lucide-react";
 import { EconomicCalendar } from "./components/EconomicCalendar";
+import { DislocationResearch } from "./modules/dislocation-research/DislocationResearch";
 import { InstrumentDrawer } from "./components/InstrumentDrawer";
 import { ContributorsTable, CorrelationMatrixTable, PortfolioDetailsTable, StressScenarioTable } from "./components/Tables";
 import { MetricCard } from "./components/MetricCard";
@@ -39,7 +40,7 @@ import { formatCurrency, formatPercent } from "./utils";
 const assetClasses = ["Equity", "Fixed Income", "Credit", "Commodity", "Cash", "Alternative"];
 const sections = ["Overview", "Risk", "Optimization", "Signals", "Stress", "Workbench", "Renders"] as const;
 type Section = (typeof sections)[number];
-type PlatformModule = "portfolio-risk" | "riskoptima-explorer" | "options-workbench" | "rates-workbench" | "backtest-studio" | "economic-calendar";
+type PlatformModule = "portfolio-risk" | "riskoptima-explorer" | "options-workbench" | "rates-workbench" | "backtest-studio" | "economic-calendar" | "dislocation-research";
 const platformVersion = "0.3.1";
 
 function previousBusinessDateString(base = new Date()) {
@@ -317,6 +318,7 @@ export function App() {
 
         <nav className="platform-menu" aria-label="Platform modules">
           <span className="sidebar-heading">Modules</span>
+          <button className={activeModule === "dislocation-research" ? "module-link module-link--active" : "module-link"} type="button" onClick={() => setActiveModule("dislocation-research")}><FlaskConical size={17} /><span>Dislocation Research</span></button>
           <button
             className={activeModule === "portfolio-risk" ? "module-link module-link--active" : "module-link"}
             type="button"
@@ -422,7 +424,9 @@ export function App() {
       </aside>
 
       <section className="workspace">
-        {activeModule === "economic-calendar" ? (
+        {activeModule === "dislocation-research" ? (
+          <DislocationResearch key={selectedId} portfolio={portfolioDetail} />
+        ) : activeModule === "economic-calendar" ? (
           <EconomicCalendar />
         ) : activeModule === "riskoptima-explorer" ? (
           <RiskOptimaExplorer />

@@ -80,7 +80,7 @@ def test_portfolio_upload_risk_and_stress(tmp_path: Path):
     rates_response = client.get(f"{get_settings().api_prefix}/rates/sofr-curve")
     assert rates_response.status_code == 200
     rates = rates_response.json()
-    assert rates["library_version"] == "2.7.1"
+    assert rates["library_version"] == metadata["installed_version"]
     assert rates["curve_points"]
     assert rates["calibration"]
     assert rates["key_rate_dv01"]
